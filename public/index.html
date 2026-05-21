@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>FoodX</title>
+
+<style>
+
+body{
+    background:#111;
+    color:white;
+    font-family:sans-serif;
+    padding:20px;
+    margin:0;
+}
+
+h1{
+    margin-top:0;
+}
+
+.card{
+    background:#1f1f1f;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:14px;
+    color:white;
+    display:block;
+}
+
+.title{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.category{
+    color:orange;
+    margin-top:4px;
+}
+
+.grams{
+    margin-top:8px;
+    opacity:0.8;
+}
+
+.ingredients{
+    margin-top:12px;
+    line-height:1.5;
+    opacity:0.9;
+}
+
+.instruction{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid #333;
+    line-height:1.5;
+}
+
+.calendar{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:8px;
+    margin-top:20px;
+}
+
+.day{
+    background:#222;
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.active{
+    background:green;
+}
+
+#topbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+#topbar button{
+    flex:1;
+    background:orange;
+    color:black;
+    border:none;
+    padding:14px;
+    border-radius:14px;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#categories{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    margin-bottom:20px;
+}
+
+#categories button{
+    background:orange;
+    color:black;
+    border:none;
+    padding:10px 16px;
+    border-radius:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+select{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:#1f1f1f;
+    color:white;
+    font-size:16px;
+    margin-bottom:14px;
+}
+
+.backButton{
+    background:orange;
+    color:black;
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    font-weight:bold;
+    margin-bottom:20px;
+    cursor:pointer;
+}
+
+</style>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyCbu1jS4WTke68HfYr_Oo9hGriOGJ6b8MM",
+    authDomain: "foodxnew.firebaseapp.com",
+    projectId: "foodxnew",
+    storageBucket: "foodxnew.firebasestorage.app",
+    messagingSenderId: "854058063966",
+    appId: "1:854058063966:web:97ef85b42195c6ff687ccf"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+// TOPBAR
+
+function renderTopbar() {
+
+    return `
+
+        <div id="topbar">
+
+            <button id="menuTab">
+                Меню
+            </button>
+
+            <button id="scheduleTab">
+                График
+            </button>
+
+        </div>
+    `;
+}
+
+// TOPBAR ACTIONS
+
+function bindTopbar() {
+
+    document
+        .getElementById("menuTab")
+        .onclick = () => {
+
+            loadMenu("main");
+        };
+
+    document
+        .getElementById("scheduleTab")
+        .onclick = () => {
+
+            loadSchedule("main");
+        };
+}
+
+// MENU
+
+async function loadMenu(menuId) {
+
+    const ref =
+        doc(db, "menus", menuId);
+
+    const snap =
+        await getDoc(ref);
+
+    if (!snap.exists()) {
+
+        document.body.innerHTML =
+            "<h1>Меню не найдено</h1>";
+
+        return;
+    }
+
+    const data = snap.data();
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <h1>Меню</h1>
+
+        <div id="categories"></div>
+
+        <div id="menu-list"></div>
+    `;
+
+    bindTopbar();
+
+    const categoriesContainer =
+        document.getElementById(
+            "categories"
+        );
+
+    const menuContainer =
+        document.getElementById(
+            "menu-list"
+        );
+
+    const categories = [
+
+        "Все",
+
+        ...new Set(
+            data.dishes.map(
+                d => d.category
+            )
+        )
+    ];
+
+    let selectedCategory = "Все";
+
+    function renderDishes() {
+
+        menuContainer.innerHTML = "";
+
+        const filtered =
+            selectedCategory === "Все"
+            ? data.dishes
+            : data.dishes.filter(
+                d =>
+                d.category ===
+                selectedCategory
+            );
+
+        filtered.forEach(dish => {
+
+            menuContainer.innerHTML += `
+
+                <div
+                    class="card"
+                    onclick="
+                        loadDish(
+                            'main',
+                            '${dish.id}'
+                        )
+                    "
+                >
+
+                    <div class="title">
+                        ${dish.name}
+                    </div>
+
+                    <div class="category">
+                        ${dish.category}
+                    </div>
+
+                    <div class="grams">
+                        ${dish.grams || 0} г
+                    </div>
+
+                </div>
+            `;
+        });
+    }
+
+    categories.forEach(category => {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.innerText =
+            category;
+
+        button.onclick = () => {
+
+            selectedCategory =
+                category;
+
+            renderDishes();
+        };
+
+        categoriesContainer
+            .appendChild(button);
+    });
+
+    renderDishes();
+}
+
+// DISH
+
+window.loadDish = async function(
+    menuId,
+    dishId
+) {
+
+    const ref =
+        doc(db, "menus", menuId);
+
+    const snap =
+        await getDoc(ref);
+
+    if (!snap.exists()) {
+
+        document.body.innerHTML =
+            "<h1>Меню не найдено</h1>";
+
+        return;
+    }
+
+    const data = snap.data();
+
+    const dish =
+        data.dishes.find(
+            d => d.id === dishId
+        );
+
+    if (!dish) {
+
+        document.body.innerHTML =
+            "<h1>Блюдо не найдено</h1>";
+
+        return;
+    }
+
+    let ingredientsHTML = "";
+
+    (dish.ingredients || []).forEach(item => {
+
+        ingredientsHTML += `
+
+            <div class="card">
+                ${item}
+            </div>
+        `;
+    });
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <button
+            class="backButton"
+            onclick="loadMenu('main')"
+        >
+            ← Назад
+        </button>
+
+        <h1>
+            ${dish.name}
+        </h1>
+
+        <div class="category">
+            ${dish.category}
+        </div>
+
+        <div class="grams">
+            ${dish.grams || 0} г
+        </div>
+
+        <h2>
+            Ингредиенты
+        </h2>
+
+        ${ingredientsHTML}
+
+        <h2>
+            Приготовление
+        </h2>
+
+        <div class="card instruction">
+
+            ${dish.instruction || "Нет описания"}
+
+        </div>
+    `;
+
+    bindTopbar();
+}
+
+// SCHEDULE
+
+async function loadSchedule(scheduleId) {
+
+    const ref =
+        doc(db, "schedules", scheduleId);
+
+    const snap =
+        await getDoc(ref);
+
+    if (!snap.exists()) {
+
+        document.body.innerHTML =
+            "<h1>График не найден</h1>";
+
+        return;
+    }
+
+    const data = snap.data();
+
+    const employees =
+        data.employees || [];
+
+    if (employees.length === 0) {
+
+        document.body.innerHTML =
+            "<h1>Нет сотрудников</h1>";
+
+        return;
+    }
+
+    let selectedEmployee =
+        employees[0];
+
+    let selectedMonth = "";
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <h1>График работы</h1>
+
+        <select id="employeeSelect"></select>
+
+        <select id="monthSelect"></select>
+
+        <div id="calendar"></div>
+    `;
+
+    bindTopbar();
+
+    const employeeSelect =
+        document.getElementById(
+            "employeeSelect"
+        );
+
+    const monthSelect =
+        document.getElementById(
+            "monthSelect"
+        );
+
+    const calendar =
+        document.getElementById(
+            "calendar"
+        );
+
+    employees.forEach((emp, index) => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = index;
+
+        option.textContent =
+            emp.name;
+
+        employeeSelect
+            .appendChild(option);
+    });
+
+    function renderMonths() {
+
+        monthSelect.innerHTML = "";
+
+        const monthDays =
+            selectedEmployee.monthDays || {};
+
+        const months =
+            Object.keys(monthDays);
+
+        if (months.length === 0) {
+
+            calendar.innerHTML =
+                "<p>Нет отмеченных смен</p>";
+
+            return;
+        }
+
+        selectedMonth = months[0];
+
+        months.forEach(month => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = month;
+
+            option.textContent =
+                month;
+
+            monthSelect
+                .appendChild(option);
+        });
+
+        monthSelect.value =
+            selectedMonth;
+
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+
+        const monthDays =
+            selectedEmployee.monthDays || {};
+
+        const activeDays =
+            monthDays[selectedMonth] || [];
+
+        let html =
+            `<div class="calendar">`;
+
+        for (let i = 1; i <= 31; i++) {
+
+            html += `
+
+                <div class="
+                    day
+                    ${activeDays.includes(i)
+                        ? "active"
+                        : ""}
+                ">
+                    ${i}
+                </div>
+            `;
+        }
+
+        html += `</div>`;
+
+        calendar.innerHTML = html;
+    }
+
+    employeeSelect.onchange = () => {
+
+        selectedEmployee =
+            employees[
+                employeeSelect.value
+            ];
+
+        renderMonths();
+    };
+
+    monthSelect.onchange = () => {
+
+        selectedMonth =
+            monthSelect.value;
+
+        renderCalendar();
+    };
+
+    renderMonths();
+}
+
+// START
+
+loadMenu("main");
+
+</script>
+
+</head>
+
+<body>
+
+<h1>Загрузка...</h1>
+
+</body>
+
+</html>
