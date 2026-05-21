@@ -428,4 +428,101 @@ struct TTKPDFExporter {
             return nil
         }
     }
+    // MARK: - ORDER PDF
+
+    static func exportOrder(order: Order) -> URL? {
+        
+        let renderer = UIGraphicsPDFRenderer(
+            bounds: CGRect(
+                x: 0,
+                y: 0,
+                width: 595,
+                height: 842
+            )
+        )
+        
+        let data = renderer.pdfData { ctx in
+            
+            ctx.beginPage()
+            
+            var y: CGFloat = 40
+            
+            func draw(
+                _ text: String,
+                size: CGFloat = 14,
+                bold: Bool = false
+            ) {
+                
+                let font = bold
+                ? UIFont.boldSystemFont(ofSize: size)
+                : UIFont.systemFont(ofSize: size)
+                
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: font
+                ]
+                
+                text.draw(
+                    at: CGPoint(x: 40, y: y),
+                    withAttributes: attrs
+                )
+                
+                y += size + 12
+            }
+            
+            // HEADER
+            
+            draw(
+                "ЗАКАЗ ПОСТАВЩИКУ",
+                size: 24,
+                bold: true
+            )
+            
+            draw(
+                "Поставщик: \(order.supplier)",
+                size: 18,
+                bold: true
+            )
+            
+            draw(
+                "Дата: \(order.date.formatted())",
+                size: 14
+            )
+            
+            y += 20
+            
+            draw(
+                "ПОЗИЦИИ:",
+                size: 18,
+                bold: true
+            )
+            
+            y += 10
+            
+            for item in order.items {
+                
+                draw(
+                    "• \(item.productName) — \(item.quantity)"
+                )
+            }
+        }
+        
+        let url = FileManager.default
+            .temporaryDirectory
+            .appendingPathComponent(
+                "ORDER_\(order.supplier).pdf"
+            )
+        
+        do {
+            
+            try data.write(to: url)
+            
+            return url
+            
+        } catch {
+            
+            print("ORDER PDF ERROR:", error)
+            
+            return nil
+        }
+    }
 }

@@ -85,6 +85,30 @@ struct OrdersHistoryView: View {
                                             .foregroundColor(.orange)
                                     }
                                 }
+                                // PDF BUTTON
+
+                                Button {
+                                    
+                                    exportPDF(order: order)
+                                    
+                                } label: {
+                                    
+                                    HStack {
+                                        
+                                        Image(systemName: "doc.richtext")
+                                        
+                                        Text("PDF")
+                                            .fontWeight(.bold)
+                                    }
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(Color.orange)
+                                    .clipShape(
+                                        RoundedRectangle(cornerRadius: 14)
+                                    )
+                                }
+                                .padding(.top, 6)
                             }
                             .padding()
                             .background(
@@ -104,5 +128,29 @@ struct OrdersHistoryView: View {
         }
         .navigationTitle("История заказов")
         .navigationBarTitleDisplayMode(.inline)
+    }
+    // MARK: - PDF
+
+    func exportPDF(order: Order) {
+        
+        guard let url =
+                TTKPDFExporter.exportOrder(order: order)
+        else {
+            return
+        }
+        
+        let vc = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
+        
+        UIApplication.shared
+            .connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?
+            .windows
+            .first?
+            .rootViewController?
+            .present(vc, animated: true)
     }
 }
