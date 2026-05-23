@@ -8,13 +8,10 @@ struct EmployeesView: View {
     
     @State private var inviteCode = ""
     @State private var showInviteAlert = false
-
+    
     private let inviteService = InviteService()
     
-    
-    
-    private let service =
-        EmployeeService()
+    private let service = EmployeeService()
     
     var body: some View {
         
@@ -32,47 +29,53 @@ struct EmployeesView: View {
                         .foregroundColor(.white)
                         .padding(.top)
                     
-                    ForEach(employees) { employee in
-                        Button {
+                    // MARK: - Invite Button
+                    
+                    Button {
+                        
+                        inviteService.createInvite(
+                            restaurantId: restaurantId
+                        ) { result in
                             
-                            inviteService.createInvite(
-                                restaurantId: restaurantId
-                            ) { result in
+                            switch result {
                                 
-                                switch result {
+                            case .success(let code):
+                                
+                                DispatchQueue.main.async {
                                     
-                                case .success(let code):
-                                    
-                                    DispatchQueue.main.async {
-                                        
-                                        inviteCode = code
-                                        showInviteAlert = true
-                                    }
-                                    
-                                case .failure(let error):
-                                    
-                                    print(error.localizedDescription)
+                                    inviteCode = code
+                                    showInviteAlert = true
                                 }
-                            }
-                            
-                        } label: {
-                            
-                            HStack {
                                 
-                                Image(systemName: "person.badge.plus")
+                            case .failure(let error):
                                 
-                                Text("Создать приглашение")
-                                    .fontWeight(.bold)
+                                print(error.localizedDescription)
                             }
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 18)
-                            )
                         }
-                        .padding(.bottom, 10)
+                        
+                    } label: {
+                        
+                        HStack {
+                            
+                            Image(systemName: "person.badge.plus")
+                            
+                            Text("Создать приглашение")
+                                .fontWeight(.bold)
+                        }
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 18)
+                        )
+                    }
+                    .padding(.bottom, 10)
+                    
+                    // MARK: - Employees
+                    
+                    ForEach(employees) { employee in
+                        
                         VStack(
                             alignment: .leading,
                             spacing: 8
@@ -86,8 +89,61 @@ struct EmployeesView: View {
                                 
                                 Spacer()
                                 
-                                Text(employee.role)
+                                Menu {
+                                    
+                                    Button("Employee") {
+                                        
+                                        service.updateRole(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id,
+                                            newRole: "employee"
+                                        )
+                                        
+                                        loadEmployees()
+                                    }
+                                    
+                                    Button("Chef") {
+                                        
+                                        service.updateRole(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id,
+                                            newRole: "chef"
+                                        )
+                                        
+                                        loadEmployees()
+                                    }
+                                    
+                                    Button("Admin") {
+                                        
+                                        service.updateRole(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id,
+                                            newRole: "admin"
+                                        )
+                                        
+                                        loadEmployees()
+                                    }
+                                    
+                                } label: {
+                                    
+                                    HStack(spacing: 4) {
+                                        
+                                        Text(employee.role.capitalized)
+                                        
+                                        Image(systemName: "chevron.down")
+                                    }
                                     .foregroundColor(.orange)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Color.orange.opacity(0.15)
+                                    )
+                                    .clipShape(
+                                        RoundedRectangle(
+                                            cornerRadius: 10
+                                        )
+                                    )
+                                }
                             }
                             
                             Text(employee.email)
@@ -107,6 +163,17 @@ struct EmployeesView: View {
                 }
                 .padding()
             }
+        }
+        .alert(
+            "Код приглашения",
+            isPresented: $showInviteAlert
+        ) {
+            
+            Button("OK") { }
+            
+        } message: {
+            
+            Text(inviteCode)
         }
         .onAppear {
             

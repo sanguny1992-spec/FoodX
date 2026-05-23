@@ -120,7 +120,6 @@ struct RegisterView: View {
                             .createEmployee(
                                 name: name,
                                 email: email,
-                                password: password,
                                 restaurantId: restaurantId,
                                 role: "admin"
                             )

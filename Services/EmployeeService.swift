@@ -1,25 +1,43 @@
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 final class EmployeeService {
 
     private let db = Firestore.firestore()
-
+    
+    
+    func updateRole(
+        restaurantId: String,
+        employeeId: String,
+        newRole: String
+    ) {
+        
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .document(employeeId)
+            .updateData([
+                "role": newRole
+            ])
+    }
+ 
     func createEmployee(
         name: String,
         email: String,
-        password: String,
         restaurantId: String,
         role: String = "employee"
     ) {
 
         let employee = Employee(
-            id: UUID(),
+            id: Auth.auth().currentUser?.uid ?? "",
             name: name,
             email: email,
-            password: password,
             restaurantId: restaurantId,
-            role: role
+            role: role,
+            status: "pending",
+            createdAt: Date()
+        
         )
 
         do {
@@ -28,7 +46,7 @@ final class EmployeeService {
                 .collection("restaurants")
                 .document(restaurantId)
                 .collection("employees")
-                .document(employee.id.uuidString)
+                .document(employee.id)
                 .setData(from: employee)
 
         } catch {
