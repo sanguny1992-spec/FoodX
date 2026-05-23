@@ -1,29 +1,26 @@
 import SwiftUI
-import FirebaseCore
-
-class AppDelegate: NSObject, UIApplicationDelegate {
-
-    func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
-    ) -> Bool {
-
-        FirebaseApp.configure()
-
-        return true
-    }
-}
+import Firebase
+import FirebaseAuth
 
 @main
-struct FoodHelpApp: App {
+struct FoodXnewApp: App {
+    
+    @StateObject var auth = AuthManager()
 
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    init() {
+        FirebaseApp.configure()
+    }
 
     var body: some Scene {
-
+        
         WindowGroup {
-
-            NavigationStack {
+            
+            if auth.user == nil {
+                
+                LoginView(auth: auth)
+                
+            } else {
+                
                 ContentView()
             }
         }

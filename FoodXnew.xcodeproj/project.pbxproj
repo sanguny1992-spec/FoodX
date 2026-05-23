@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C2ED7C72FC1BF8900D6F257 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 5C2ED7C62FC1BF8900D6F257 /* FirebaseAuth */; };
 		5C507E772FB0F506004EF93A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5C507E762FB0F506004EF93A /* FirebaseCore */; };
 		5C507E792FB0F50C004EF93A /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5C507E782FB0F50C004EF93A /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
@@ -55,6 +56,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C507E772FB0F506004EF93A /* FirebaseCore in Frameworks */,
+				5C2ED7C72FC1BF8900D6F257 /* FirebaseAuth in Frameworks */,
 				5C507E792FB0F50C004EF93A /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,6 +113,7 @@
 			packageProductDependencies = (
 				5C507E762FB0F506004EF93A /* FirebaseCore */,
 				5C507E782FB0F50C004EF93A /* FirebaseFirestore */,
+				5C2ED7C62FC1BF8900D6F257 /* FirebaseAuth */,
 			);
 			productName = FoodXnew;
 			productReference = 5CD96FFD2FB0F68A008BDD25 /* FoodXnew.app */;
@@ -394,6 +397,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5C2ED7C62FC1BF8900D6F257 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5C507E722FB0F10D004EF93A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
 		5C507E762FB0F506004EF93A /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5C507E722FB0F10D004EF93A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
