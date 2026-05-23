@@ -95,6 +95,18 @@ h1{
     cursor:pointer;
 }
 
+.searchInput{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:#1f1f1f;
+    color:white;
+    font-size:16px;
+    margin-bottom:20px;
+    box-sizing:border-box;
+}
+
 #categories{
     display:flex;
     gap:10px;
@@ -150,7 +162,7 @@ from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyCbu1jS4WTke68HfYr_Oo9hGriOGJ6b8MM",
+    apiKey: "YOUR_API_KEY",
     authDomain: "foodxnew.firebaseapp.com",
     projectId: "foodxnew",
     storageBucket: "foodxnew.firebasestorage.app",
@@ -178,11 +190,15 @@ function renderTopbar() {
                 График
             </button>
 
+            <button id="semiTab">
+                Полуфабрикаты
+            </button>
+
         </div>
     `;
 }
 
-// TOPBAR ACTIONS
+// ACTIONS
 
 function bindTopbar() {
 
@@ -198,6 +214,13 @@ function bindTopbar() {
         .onclick = () => {
 
             loadSchedule("main");
+        };
+
+    document
+        .getElementById("semiTab")
+        .onclick = () => {
+
+            loadSemi("main");
         };
 }
 
@@ -226,6 +249,12 @@ async function loadMenu(menuId) {
         ${renderTopbar()}
 
         <h1>Меню</h1>
+
+        <input
+            id="menuSearch"
+            class="searchInput"
+            placeholder="Поиск блюда..."
+        />
 
         <div id="categories"></div>
 
@@ -256,19 +285,26 @@ async function loadMenu(menuId) {
     ];
 
     let selectedCategory = "Все";
+    let searchText = "";
 
     function renderDishes() {
 
         menuContainer.innerHTML = "";
 
         const filtered =
-            selectedCategory === "Все"
-            ? data.dishes
-            : data.dishes.filter(
-                d =>
-                d.category ===
-                selectedCategory
-            );
+            data.dishes.filter(d => {
+
+                const matchCategory =
+                    selectedCategory === "Все"
+                    || d.category === selectedCategory;
+
+                const matchSearch =
+                    d.name
+                    .toLowerCase()
+                    .includes(searchText.toLowerCase());
+
+                return matchCategory && matchSearch;
+            });
 
         filtered.forEach(dish => {
 
@@ -324,6 +360,15 @@ async function loadMenu(menuId) {
     });
 
     renderDishes();
+
+    document
+        .getElementById("menuSearch")
+        .addEventListener("input", e => {
+
+            searchText = e.target.value;
+
+            renderDishes();
+        });
 }
 
 // DISH
@@ -339,28 +384,12 @@ window.loadDish = async function(
     const snap =
         await getDoc(ref);
 
-    if (!snap.exists()) {
-
-        document.body.innerHTML =
-            "<h1>Меню не найдено</h1>";
-
-        return;
-    }
-
     const data = snap.data();
 
     const dish =
         data.dishes.find(
             d => d.id === dishId
         );
-
-    if (!dish) {
-
-        document.body.innerHTML =
-            "<h1>Блюдо не найдено</h1>";
-
-        return;
-    }
 
     let ingredientsHTML = "";
 
@@ -385,9 +414,7 @@ window.loadDish = async function(
             ← Назад
         </button>
 
-        <h1>
-            ${dish.name}
-        </h1>
+        <h1>${dish.name}</h1>
 
         <div class="category">
             ${dish.category}
@@ -397,15 +424,11 @@ window.loadDish = async function(
             ${dish.grams || 0} г
         </div>
 
-        <h2>
-            Ингредиенты
-        </h2>
+        <h2>Ингредиенты</h2>
 
         ${ingredientsHTML}
 
-        <h2>
-            Приготовление
-        </h2>
+        <h2>Приготовление</h2>
 
         <div class="card instruction">
 
@@ -591,6 +614,125 @@ async function loadSchedule(scheduleId) {
     };
 
     renderMonths();
+}
+
+// SEMI
+
+async function loadSemi(semiId) {
+
+    const ref =
+        doc(db, "semi", semiId);
+
+    const snap =
+        await getDoc(ref);
+
+    if (!snap.exists()) {
+
+        document.body.innerHTML =
+            "<h1>Полуфабрикаты не найдены</h1>";
+
+        return;
+    }
+
+    const data = snap.data();
+
+    const semiProducts =
+        data.semiProducts || [];
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <h1>Полуфабрикаты</h1>
+
+        <input
+            id="semiSearch"
+            class="searchInput"
+            placeholder="Поиск полуфабриката..."
+        />
+
+        <div id="semi-list"></div>
+    `;
+
+    bindTopbar();
+
+    const container =
+        document.getElementById(
+            "semi-list"
+        );
+
+    const searchInput =
+        document.getElementById(
+            "semiSearch"
+        );
+
+    function renderSemi(search = "") {
+
+        container.innerHTML = "";
+
+        const filtered =
+            semiProducts.filter(semi =>
+                semi.name
+                    .toLowerCase()
+                    .includes(search.toLowerCase())
+            );
+
+        filtered.forEach(semi => {
+
+            let ingredientsHTML = "";
+
+            (semi.ingredients || []).forEach(item => {
+
+                ingredientsHTML += `
+
+                    <div class="card">
+                        ${item.name}
+                        —
+                        ${item.grams} г
+                    </div>
+                `;
+            });
+
+            container.innerHTML += `
+
+                <div class="card">
+
+                    <div class="title">
+                        ${semi.name}
+                    </div>
+
+                    <div class="grams">
+                        Выход:
+                        ${semi.grams || 0} г
+                    </div>
+
+                    <div class="ingredients">
+
+                        <h3>Ингредиенты</h3>
+
+                        ${ingredientsHTML}
+
+                    </div>
+
+                    <div class="instruction">
+
+                        <h3>Технология</h3>
+
+                        ${semi.instruction || "Нет описания"}
+
+                    </div>
+
+                </div>
+            `;
+        });
+    }
+
+    renderSemi();
+
+    searchInput.addEventListener("input", e => {
+
+        renderSemi(e.target.value);
+    });
 }
 
 // START

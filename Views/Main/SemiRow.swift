@@ -143,10 +143,26 @@ struct SemiRow: View {
                         .font(.title2)
                     }
                     
-                    Button("Редактировать") {
+                    Button {
+
                         nameText = item.name
-                        gramsText = String(item.outputQuantityInGrams)
-                        isEditing.toggle()
+
+                        gramsText = String(
+                            item.outputQuantityInGrams
+                        )
+
+                        withAnimation {
+
+                            isEditing.toggle()
+                        }
+
+                    } label: {
+
+                        Text(
+                            isEditing
+                            ? "Закрыть"
+                            : "Редактировать"
+                        )
                     }
                     .foregroundColor(.blue)
                     
@@ -213,10 +229,15 @@ struct SemiRow: View {
             .padding()
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16))
-            
-            .onTapGesture {
-                isEditing.toggle()
+            .onAppear {
+
+                nameText = item.name
+
+                gramsText = String(
+                    item.outputQuantityInGrams
+                )
             }
+           
             
             .sheet(isPresented: $showTTK) {
                 

@@ -2,15 +2,14 @@ import SwiftUI
 
 struct SemiLibraryView: View {
     
-    @State private var semiShareLink = ""
-    @State private var showShare = false
-
-    private let semiService = SemiShareService()
-    
-    
     @ObservedObject var store: InventoryStore
     
     @State private var search = ""
+    
+    @State private var semiShareLink = ""
+    @State private var showShare = false
+    
+    private let semiService = SemiShareService()
     
     var filtered: [SemiFinishedProduct] {
         
@@ -41,6 +40,9 @@ struct SemiLibraryView: View {
                 ScrollView(showsIndicators: false) {
                     
                     VStack(spacing: 16) {
+                        
+                        // SHARE BUTTON
+                        
                         Button {
                             
                             shareSemiProducts()
@@ -63,10 +65,14 @@ struct SemiLibraryView: View {
                             )
                         }
                         
+                        // TITLE
+                        
                         Text("База полуфабрикатов")
                             .font(.largeTitle.bold())
                             .foregroundColor(.white)
-                            .padding(.top, 20)
+                            .padding(.top, 10)
+                        
+                        // SEARCH
                         
                         TextField(
                             "Поиск полуфабриката",
@@ -81,49 +87,16 @@ struct SemiLibraryView: View {
                         )
                         .foregroundColor(.white)
                         
+                        // LIST
+                        
                         VStack(spacing: 14) {
                             
                             ForEach(filtered) { semi in
                                 
-                                NavigationLink {
-                                    
-                                    SemiDetailView(semi: semi)
-                                    
-                                } label: {
-                                    
-                                    VStack(
-                                        alignment: .leading,
-                                        spacing: 10
-                                    ) {
-                                        
-                                        Text(semi.name)
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                        
-                                        Text(
-                                            "Выход: \(Int(semi.outputQuantityInGrams)) г"
-                                        )
-                                        .foregroundColor(.orange)
-                                        
-                                        Text(
-                                            "\(semi.ingredients.count) ингредиентов"
-                                        )
-                                        .foregroundColor(.gray)
-                                    }
-                                    .frame(
-                                        maxWidth: .infinity,
-                                        alignment: .leading
-                                    )
-                                    .padding()
-                                    .background(
-                                        Color.white.opacity(0.05)
-                                    )
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 22
-                                        )
-                                    )
-                                }
+                                SemiRow(
+                                    store: store,
+                                    semi: semi
+                                )
                             }
                         }
                     }
@@ -139,6 +112,8 @@ struct SemiLibraryView: View {
             )
         }
     }
+    
+    // MARK: SHARE
     
     func shareSemiProducts() {
         
@@ -163,5 +138,4 @@ struct SemiLibraryView: View {
             }
         }
     }
-    
 }

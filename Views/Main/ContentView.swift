@@ -226,14 +226,8 @@ struct ContentView: View {
                                 }
                                 
                             case .semi:
-                                
-                                ForEach(filteredSemiProducts) { semi in
-                                    
-                                    SemiRow(
-                                        store: store,
-                                        semi: semi
-                                    )
-                                }
+
+                                SemiLibraryView(store: store)
                             }
                         }
                         .padding(.horizontal)
