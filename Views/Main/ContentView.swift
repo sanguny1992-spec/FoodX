@@ -23,6 +23,9 @@ struct ContentView: View {
     
     @State private var type: AddTarget = .stock
     
+    @State private var showInviteAlert = false
+    @State private var inviteCode = ""
+    
     @FocusState private var focusedField: Field?
     
     enum Field {
@@ -232,8 +235,6 @@ struct ContentView: View {
                         
                         // 📦 СПИСОК
                         
-                        // 📦 СПИСОК
-                        
                         VStack(spacing: 12) {
                             
                             switch type {
@@ -258,176 +259,178 @@ struct ContentView: View {
                         }
                         .padding(.horizontal)
                         .padding(.top, 14)
-                            
-                            // 👥 СОТРУДНИКИ
-                            
-                            NavigationLink {
-                                
-                                EmployeesView(
-                                    restaurantId: "demo_restaurant"
-                                )
-                                
-                            } label: {
-                                
-                                VStack(spacing: 8) {
-                                    
-                                    Image(systemName: "person.3.fill")
-                                        .font(.system(size: 28))
-                                    
-                                    Text("Сотрудники")
-                                        .font(.headline)
-                                }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(
-                                    Color.white.opacity(0.06)
-                                )
-                                .clipShape(
-                                    RoundedRectangle(cornerRadius: 24)
-                                )
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 20)
-                            .padding(.bottom, 40)
-                        }
-                    }
-                    .scrollDismissesKeyboard(.immediately)
-                }
-                .preferredColorScheme(.dark)
-                .ignoresSafeArea(.keyboard)
-                .onTapGesture {
-                    
-                    hideKeyboard()
-                    focusedField = nil
-                }
-               
-                    
-                    .toolbar {
                         
-                        ToolbarItem(placement: .topBarLeading) {
+                        // 👥 СОТРУДНИКИ
+                        
+                        NavigationLink {
                             
-                            HStack(spacing: 10) {
+                            EmployeesView(
+                                restaurantId: "demo_restaurant"
+                            )
+                            
+                        } label: {
+                            
+                            VStack(spacing: 8) {
                                 
-                                Button {
-                                    
-                                    auth.signOut()
-                                    
-                                } label: {
-                                    
-                                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                                        .foregroundColor(.red)
-                                }
+                                Image(systemName: "person.3.fill")
+                                    .font(.system(size: 28))
                                 
-                                Text("By Zabredun")
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.35))
-                                    .italic()
-                                    .blur(radius: 0.3)
+                                Text("Сотрудники")
+                                    .font(.headline)
                             }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                Color.white.opacity(0.06)
+                            )
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 24)
+                            )
                         }
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                        .padding(.bottom, 40)
                     }
+                }
+                .scrollDismissesKeyboard(.immediately)
             }
-            
-            // 🍳 МЕНЮ
-            
+            .preferredColorScheme(.dark)
+            .ignoresSafeArea(.keyboard)
+            .onTapGesture {
+                
+                hideKeyboard()
+                focusedField = nil
+            }
+            .toolbar {
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    
+                    HStack(spacing: 10) {
+                        
+                        Button {
+                            
+                            auth.signOut()
+                            
+                        } label: {
+                            
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .foregroundColor(.red)
+                        }
+                        
+                        Text("By Zabredun")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.35))
+                            .italic()
+                            .blur(radius: 0.3)
+                    }
+                }
+            }
             .sheet(isPresented: $showMenu) {
                 
                 DishMenuView(store: store)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             }
-            
-            // 📅 ГРАФИК
-            
             .sheet(isPresented: $showSchedule) {
                 
                 WorkScheduleView()
             }
-        }
-        
-        // MARK: - ADD
-        
-        func add() {
-            
-            guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
-                return
+            .alert(
+                "Код приглашения",
+                isPresented: $showInviteAlert
+            ) {
+                
+                Button("OK") { }
+                
+            } message: {
+                
+                Text(inviteCode)
             }
-            
-            guard let q = Double(
-                qty.replacingOccurrences(of: ",", with: ".")
-            ) else {
-                return
-            }
-            
-            switch type {
-                
-            case .stock:
-                
-                let pr = Double(
-                    price.replacingOccurrences(of: ",", with: ".")
-                )
-                
-                let product = Product(
-                    name: name,
-                    quantityInGrams: q,
-                    pricePerKg: pr
-                )
-                
-                store.products.append(product)
-                
-            case .semi:
-                
-                let semi = SemiFinishedProduct(
-                    name: name,
-                    outputQuantityInGrams: q,
-                    ingredients: [],
-                    instruction: ""
-                )
-                
-                store.semiProducts.append(semi)
-            }
-            
-            store.save()
-            
-            name = ""
-            qty = ""
-            price = ""
-            
-            focusedField = nil
-            
-            hideKeyboard()
-        }
-        
-        // MARK: - FILTER
-        
-        var filteredSemiProducts: [SemiFinishedProduct] {
-            
-            searchText.isEmpty
-            ? store.semiProducts
-            : store.semiProducts.filter {
-                $0.name.lowercased().contains(
-                    searchText.lowercased()
-                )
-            }
-        }
-        
-        // MARK: - UI
-        
-        func glassField(
-            _ placeholder: String,
-            text: Binding<String>
-        ) -> some View {
-            
-            TextField(placeholder, text: text)
-                .padding(12)
-                .background(
-                    Color.white.opacity(0.08)
-                )
-                .clipShape(
-                    RoundedRectangle(cornerRadius: 14)
-                )
-                .foregroundColor(.white)
         }
     }
-
+    
+    // MARK: - ADD
+    
+    func add() {
+        
+        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        
+        guard let q = Double(
+            qty.replacingOccurrences(of: ",", with: ".")
+        ) else {
+            return
+        }
+        
+        switch type {
+            
+        case .stock:
+            
+            let pr = Double(
+                price.replacingOccurrences(of: ",", with: ".")
+            )
+            
+            let product = Product(
+                name: name,
+                quantityInGrams: q,
+                pricePerKg: pr
+            )
+            
+            store.products.append(product)
+            
+        case .semi:
+            
+            let semi = SemiFinishedProduct(
+                name: name,
+                outputQuantityInGrams: q,
+                ingredients: [],
+                instruction: ""
+            )
+            
+            store.semiProducts.append(semi)
+        }
+        
+        store.save()
+        
+        name = ""
+        qty = ""
+        price = ""
+        
+        focusedField = nil
+        
+        hideKeyboard()
+    }
+    
+    // MARK: - FILTER
+    
+    var filteredSemiProducts: [SemiFinishedProduct] {
+        
+        searchText.isEmpty
+        ? store.semiProducts
+        : store.semiProducts.filter {
+            $0.name.lowercased().contains(
+                searchText.lowercased()
+            )
+        }
+    }
+    
+    // MARK: - UI
+    
+    func glassField(
+        _ placeholder: String,
+        text: Binding<String>
+    ) -> some View {
+        
+        TextField(placeholder, text: text)
+            .padding(12)
+            .background(
+                Color.white.opacity(0.08)
+            )
+            .clipShape(
+                RoundedRectangle(cornerRadius: 14)
+            )
+            .foregroundColor(.white)
+    }
+}

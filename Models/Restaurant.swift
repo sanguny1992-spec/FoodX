@@ -1,10 +1,8 @@
 import Foundation
-import FirebaseFirestore
 
 struct Restaurant: Identifiable, Codable {
     
     var id: String
-    
     var name: String
     
     var ownerId: String
