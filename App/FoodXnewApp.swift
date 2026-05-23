@@ -22,6 +22,7 @@ struct FoodXnewApp: App {
             } else {
                 
                 ContentView()
+                    .environmentObject(auth)
             }
         }
     }

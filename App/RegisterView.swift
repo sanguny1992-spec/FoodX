@@ -1,5 +1,8 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
+
+
 
 struct RegisterView: View {
     

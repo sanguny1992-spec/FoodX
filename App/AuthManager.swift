@@ -24,4 +24,16 @@ final class AuthManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
+    func signOut() {
+
+        do {
+
+            try Auth.auth().signOut()
+            self.user = nil
+
+        } catch {
+
+            print(error.localizedDescription)
+        }
+    }
 }

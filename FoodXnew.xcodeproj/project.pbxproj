@@ -17,6 +17,16 @@
 		5CD96FFD2FB0F68A008BDD25 /* FoodXnew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodXnew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5C2ED7F82FC1F89100D6F257 /* Exceptions for "Views" folder in "FoodXnew" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Viewer/Untitled.swift,
+			);
+			target = 5CEC03092FB0E23200F4E71E /* FoodXnew */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5C2ED7F02FC1F2A600D6F257 /* Managers */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -40,6 +50,9 @@
 		};
 		5C507E242FB0E70A004EF93A /* Views */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5C2ED7F82FC1F89100D6F257 /* Exceptions for "Views" folder in "FoodXnew" target */,
+			);
 			path = Views;
 			sourceTree = "<group>";
 		};
