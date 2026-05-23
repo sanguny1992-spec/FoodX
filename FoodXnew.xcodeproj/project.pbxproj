@@ -18,6 +18,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5C2ED7F02FC1F2A600D6F257 /* Managers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Managers;
+			sourceTree = "<group>";
+		};
 		5C507DFD2FB0E4C2004EF93A /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = App;
@@ -75,6 +80,7 @@
 		5CEC03012FB0E23200F4E71E = {
 			isa = PBXGroup;
 			children = (
+				5C2ED7F02FC1F2A600D6F257 /* Managers */,
 				5C507E602FB0E9A9004EF93A /* Services */,
 				5CEC030C2FB0E23200F4E71E /* FoodXnew */,
 				5C507DFD2FB0E4C2004EF93A /* App */,
@@ -102,6 +108,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				5C2ED7F02FC1F2A600D6F257 /* Managers */,
 				5C507DFD2FB0E4C2004EF93A /* App */,
 				5C507E052FB0E543004EF93A /* Models */,
 				5C507E182FB0E637004EF93A /* Stores */,

@@ -36,4 +36,34 @@ final class EmployeeService {
             print(error.localizedDescription)
         }
     }
+    func fetchEmployees(
+        restaurantId: String,
+        completion: @escaping ([Employee]) -> Void
+    ) {
+
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .getDocuments { snapshot, error in
+
+                if let error {
+
+                    print(error.localizedDescription)
+                    completion([])
+                    return
+                }
+
+                guard let docs = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+
+                let employees = docs.compactMap {
+
+                    try? $0.data(as: Employee.self)
+                }
+
+                completion(employees)
+            }
+    }
 }
