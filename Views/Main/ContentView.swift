@@ -247,6 +247,32 @@ struct ContentView: View {
         }
         
         // 🍳 МЕНЮ БЛЮД
+        NavigationLink {
+            
+            EmployeesView(
+                restaurantId: "demo_restaurant"
+            )
+            
+        } label: {
+            
+            VStack(spacing: 8) {
+                
+                Image(systemName: "person.3.fill")
+                    .font(.system(size: 28))
+                
+                Text("Сотрудники")
+                    .font(.headline)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                Color.white.opacity(0.06)
+            )
+            .clipShape(
+                RoundedRectangle(cornerRadius: 24)
+            )
+        }
         
         .sheet(isPresented: $showMenu) {
             
