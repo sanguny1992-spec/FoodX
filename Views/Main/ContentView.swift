@@ -57,6 +57,18 @@ struct ContentView: View {
                             
                             HStack {
                                 
+                                HStack(spacing: 6) {
+                                    
+                                    Image(systemName: "sparkles")
+                                        .font(.caption2)
+                                        .foregroundColor(.white.opacity(0.35))
+                                    
+                                    Text("By Zabredun")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.35))
+                                        .italic()
+                                }
+                                
                                 Spacer()
                                 
                                 // 🚚 ПОСТАВЩИКИ
@@ -289,21 +301,32 @@ struct ContentView: View {
                     hideKeyboard()
                     focusedField = nil
                 }
-                .toolbar {
+               
                     
-                    ToolbarItem(placement: .topBarLeading) {
+                    .toolbar {
                         
-                        Button {
+                        ToolbarItem(placement: .topBarLeading) {
                             
-                            auth.signOut()
-                            
-                        } label: {
-                            
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .foregroundColor(.red)
+                            HStack(spacing: 10) {
+                                
+                                Button {
+                                    
+                                    auth.signOut()
+                                    
+                                } label: {
+                                    
+                                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                                        .foregroundColor(.red)
+                                }
+                                
+                                Text("By Zabredun")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.35))
+                                    .italic()
+                                    .blur(radius: 0.3)
+                            }
                         }
                     }
-                }
             }
             
             // 🍳 МЕНЮ
