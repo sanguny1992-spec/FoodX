@@ -14,15 +14,8 @@ struct FoodXnewApp: App {
     var body: some Scene {
         
         WindowGroup {
-            
-            if auth.user == nil {
-                
-                LoginView(auth: auth)
-                
-            } else {
-                
-                ContentView()
-            }
+
+            ContentView()
         }
     }
 }

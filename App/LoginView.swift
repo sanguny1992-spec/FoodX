@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     
@@ -7,138 +8,108 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     
-    @State private var isRegister = false
-    
-    @State private var errorText = ""
+    @State private var showRegister = false
     
     var body: some View {
         
-        ZStack {
+        NavigationStack {
             
-            Image("FoodX")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            
-            Color.black.opacity(0.85)
-                .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
+            ZStack {
                 
-                Spacer()
+                Color.black
+                    .ignoresSafeArea()
                 
-                Text("FoodX")
-                    .font(.system(size: 42, weight: .bold))
-                    .foregroundColor(.white)
-                
-                Text(
-                    isRegister
-                    ? "Регистрация сотрудника"
-                    : "Вход сотрудника"
-                )
-                .foregroundColor(.gray)
-                
-                VStack(spacing: 14) {
+                VStack(spacing: 16) {
+                    
+                    Spacer()
+                    
+                    Text("FoodX")
+                        .font(.system(size: 42, weight: .bold))
+                        .foregroundColor(.orange)
+                    
+                    Text("Вход")
+                        .font(.title.bold())
+                        .foregroundColor(.white)
                     
                     TextField(
                         "Email",
                         text: $email
                     )
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
                     .padding()
-                    .background(
-                        Color.white.opacity(0.08)
-                    )
+                    .background(Color.white)
                     .clipShape(
-                        RoundedRectangle(cornerRadius: 18)
+                        RoundedRectangle(cornerRadius: 14)
                     )
-                    .foregroundColor(.white)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
                     
                     SecureField(
                         "Пароль",
                         text: $password
                     )
                     .padding()
-                    .background(
-                        Color.white.opacity(0.08)
-                    )
+                    .background(Color.white)
                     .clipShape(
-                        RoundedRectangle(cornerRadius: 18)
+                        RoundedRectangle(cornerRadius: 14)
                     )
-                    .foregroundColor(.white)
-                }
-                
-                if !errorText.isEmpty {
                     
-                    Text(errorText)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                }
-                
-                Button {
-                    
-                    if isRegister {
+                    Button {
                         
-                        auth.register(
-                            email: email,
-                            password: password
-                        ) { error in
-                            
-                            if let error {
-                                errorText = error
-                            }
-                        }
+                        login()
                         
-                    } else {
+                    } label: {
                         
-                        auth.signIn(
-                            email: email,
-                            password: password
-                        ) { error in
-                            
-                            if let error {
-                                errorText = error
-                            }
-                        }
+                        Text("Войти")
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 16)
+                            )
                     }
                     
-                } label: {
+                    Button {
+                        
+                        showRegister = true
+                        
+                    } label: {
+                        
+                        Text("Создать аккаунт")
+                            .foregroundColor(.white)
+                    }
                     
-                    Text(
-                        isRegister
-                        ? "Создать аккаунт"
-                        : "Войти"
-                    )
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.orange)
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 18)
-                    )
+                    Spacer()
                 }
-                
-                Button {
-                    
-                    isRegister.toggle()
-                    errorText = ""
-                    
-                } label: {
-                    
-                    Text(
-                        isRegister
-                        ? "Уже есть аккаунт?"
-                        : "Создать аккаунт"
-                    )
-                    .foregroundColor(.white)
-                }
-                
-                Spacer()
+                .padding()
             }
-            .padding()
+            .navigationDestination(
+                isPresented: $showRegister
+            ) {
+                
+                RegisterView(auth: auth)
+            }
         }
-        .preferredColorScheme(.dark)
+    }
+    
+    func login() {
+        
+        Auth.auth().signIn(
+            withEmail: email,
+            password: password
+        ) { result, error in
+            
+            if let error {
+                
+                print(error.localizedDescription)
+                return
+            }
+            
+            DispatchQueue.main.async {
+                
+                auth.user = result?.user
+            }
+        }
     }
 }

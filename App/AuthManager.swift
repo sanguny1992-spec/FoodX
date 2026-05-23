@@ -1,6 +1,6 @@
 import Foundation
-import Combine
 import FirebaseAuth
+import Combine
 
 final class AuthManager: ObservableObject {
     
@@ -58,16 +58,10 @@ final class AuthManager: ObservableObject {
     
     // LOGOUT
     
-    func signOut() {
+    func logout() {
         
-        do {
-            
-            try Auth.auth().signOut()
-            self.user = nil
-            
-        } catch {
-            
-            print(error.localizedDescription)
-        }
+        try? Auth.auth().signOut()
+        
+        self.user = nil
     }
 }
