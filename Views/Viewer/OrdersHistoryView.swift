@@ -108,7 +108,7 @@ struct OrdersHistoryView: View {
                                         RoundedRectangle(cornerRadius: 14)
                                     )
                                 }
-                                .padding(.top, 6)
+                                .padding(.top, 20)
                             }
                             .padding()
                             .background(

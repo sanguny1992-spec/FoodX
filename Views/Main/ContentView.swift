@@ -196,7 +196,7 @@ struct ContentView: View {
                             RoundedRectangle(cornerRadius: 20)
                         )
                         .padding(.horizontal)
-                        .padding(.top, 10)
+                        .padding(.top, 60)
                         
                         // 🔍 ПОИСК
                         
