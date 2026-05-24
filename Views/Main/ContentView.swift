@@ -265,7 +265,7 @@ struct ContentView: View {
                         NavigationLink {
                             
                             EmployeesView(
-                                restaurantId: "demo_restaurant"
+                                restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
                             )
                             
                         } label: {

@@ -11,7 +11,15 @@ struct LoginView: View {
     @State private var showRegister = false
     
     var body: some View {
-        
+        NavigationLink {
+            
+            EmployeeRegisterView(auth: auth)
+            
+        } label: {
+            
+            Text("Регистрация сотрудника")
+                .foregroundColor(.orange)
+        }
         NavigationStack {
             
             ZStack {
@@ -69,7 +77,15 @@ struct LoginView: View {
                                 RoundedRectangle(cornerRadius: 16)
                             )
                     }
-                    
+                    NavigationLink {
+                        
+                        EmployeeRegisterView(auth: auth)
+                        
+                    } label: {
+                        
+                        Text("Регистрация сотрудника")
+                            .foregroundColor(.orange)
+                    }
                     Button {
                         
                         showRegister = true
