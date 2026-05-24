@@ -97,4 +97,43 @@ final class EmployeeService {
                 "status": "approved"
             ])
     }
+    func blockEmployee(
+        restaurantId: String,
+        employeeId: String
+    ) {
+        
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .document(employeeId)
+            .updateData([
+                "status": "blocked"
+            ])
+    }
+
+    func unblockEmployee(
+        restaurantId: String,
+        employeeId: String
+    ) {
+        
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .document(employeeId)
+            .updateData([
+                "status": "approved"
+            ])
+    }
+
+    func deleteEmployee(
+        restaurantId: String,
+        employeeId: String
+    ) {
+        
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .document(employeeId)
+            .delete()
+    }
 }

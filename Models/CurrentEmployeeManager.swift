@@ -1,22 +1,30 @@
 import Foundation
-import Combine
 import FirebaseAuth
 import FirebaseFirestore
+import Combine
 
-final class CurrentEmployeeManager: ObservableObject {
+final class CurrentEmployeeManager:
+ObservableObject {
     
-    @Published var currentEmployee: Employee?
+    @Published var employee: Employee?
     
     private let db = Firestore.firestore()
     
-    func fetchCurrentEmployee() {
+    func loadEmployee(
+        restaurantId: String
+    ) {
         
-        guard let uid = Auth.auth().currentUser?.uid else {
+        guard let uid =
+            Auth.auth().currentUser?.uid
+        else {
             return
         }
         
         db.collection("restaurants")
-            .getDocuments { snapshot, error in
+            .document(restaurantId)
+            .collection("employees")
+            .document(uid)
+            .getDocument { snapshot, error in
                 
                 if let error {
                     
@@ -24,29 +32,26 @@ final class CurrentEmployeeManager: ObservableObject {
                     return
                 }
                 
-                guard let restaurants = snapshot?.documents else {
+                guard let snapshot else {
                     return
                 }
                 
-                for restaurant in restaurants {
+                do {
                     
-                    let restaurantId = restaurant.documentID
+                    let employee =
+                        try snapshot.data(
+                            as: Employee.self
+                        )
                     
-                    self.db.collection("restaurants")
-                        .document(restaurantId)
-                        .collection("employees")
-                        .document(uid)
-                        .getDocument { snapshot, error in
-                            
-                            if let employee =
-                                try? snapshot?.data(as: Employee.self) {
-                                
-                                DispatchQueue.main.async {
-                                    
-                                    self.currentEmployee = employee
-                                }
-                            }
-                        }
+                    DispatchQueue.main.async {
+                        
+                        self.employee =
+                            employee
+                    }
+                    
+                } catch {
+                    
+                    print(error.localizedDescription)
                 }
             }
     }

@@ -147,6 +147,101 @@ struct EmployeesView: View {
                             }
                             
                             Text(employee.email)
+                            HStack(spacing: 10) {
+                                
+                                // APPROVE
+                                
+                                if employee.status == "pending" {
+                                    
+                                    Button {
+                                        
+                                        service.approveEmployee(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id
+                                        )
+                                        
+                                        loadEmployees()
+                                        
+                                    } label: {
+                                        
+                                        Text("Approve")
+                                            .font(.caption.bold())
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color.green)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                                
+                                // BLOCK
+                                
+                                if employee.status == "approved" {
+                                    
+                                    Button {
+                                        
+                                        service.blockEmployee(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id
+                                        )
+                                        
+                                        loadEmployees()
+                                        
+                                    } label: {
+                                        
+                                        Text("Block")
+                                            .font(.caption.bold())
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color.red)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                                
+                                // UNBLOCK
+                                
+                                if employee.status == "blocked" {
+                                    
+                                    Button {
+                                        
+                                        service.unblockEmployee(
+                                            restaurantId: restaurantId,
+                                            employeeId: employee.id
+                                        )
+                                        
+                                        loadEmployees()
+                                        
+                                    } label: {
+                                        
+                                        Text("Unblock")
+                                            .font(.caption.bold())
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color.orange)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                                
+                                // DELETE
+                                
+                                Button {
+                                    
+                                    service.deleteEmployee(
+                                        restaurantId: restaurantId,
+                                        employeeId: employee.id
+                                    )
+                                    
+                                    loadEmployees()
+                                    
+                                } label: {
+                                    
+                                    Image(systemName: "trash.fill")
+                                        .foregroundColor(.red)
+                                }
+                            }
+                            .padding(.top, 8)
                                 .foregroundColor(.gray)
                             Text(employee.status.capitalized)
                                 .foregroundColor(

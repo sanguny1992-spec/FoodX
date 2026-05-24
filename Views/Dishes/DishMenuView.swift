@@ -3,6 +3,9 @@ import UIKit
 
 struct DishMenuView: View {
     
+    @StateObject private var currentEmployee =
+    CurrentEmployeeManager()
+    
     @State private var showLinkAlert = false
     @State private var currentLink = ""
     @State private var shareLink = ""
@@ -75,6 +78,13 @@ struct DishMenuView: View {
                                     .font(.title2)
                                     .foregroundColor(.orange)
                             }
+                            .onAppear {
+                                
+                                currentEmployee.loadEmployee(
+                                    restaurantId:
+                                        "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+                                )
+                            }
                         }
                         .padding(.bottom, 10)
                         
@@ -113,178 +123,254 @@ struct DishMenuView: View {
                         
                         // СОЗДАТЬ БЛЮДО
                         
-                        NavigationLink {
+                        if currentEmployee.employee?.role != "employee" {
                             
-                            DishBuilderView(
-                                store: store,
-                                editingDish: nil
-                            )
-                            
-                        } label: {
-                            
-                            HStack {
+                            NavigationLink {
                                 
-                                Image(systemName: "plus.circle.fill")
-                                
-                                Text("Создать блюдо")
-                                    .fontWeight(.bold)
-                            }
-                            .font(.title3)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(
-                                    colors: [.orange, .red],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+                                DishBuilderView(
+                                    store: store,
+                                    editingDish: nil
                                 )
-                            )
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 22)
-                            )
+                                
+                            } label: {
+                                
+                                HStack {
+                                    
+                                    Image(systemName: "plus.circle.fill")
+                                    
+                                    Text("Создать блюдо")
+                                        .fontWeight(.bold)
+                                }
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    LinearGradient(
+                                        colors: [.orange, .red],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .clipShape(
+                                    RoundedRectangle(cornerRadius: 22)
+                                )
+                            }
                         }
                         
                         // СПИСОК БЛЮД
                         
                         ForEach(filteredDishes) { dish in
                             
-                            NavigationLink {
+                           
                                 
-                                DishBuilderView(
-                                    store: store,
-                                    editingDish: dish
-                                )
-                                
-                            } label: {
-                                
-                                HStack(spacing: 16) {
+                                if currentEmployee.employee?.role == "employee" {
                                     
-                                    // IMAGE
+                                    // ПРОСТО КАРТОЧКА БЕЗ EDIT
                                     
-                                    ZStack {
+                                    HStack(spacing: 16) {
                                         
-                                        RoundedRectangle(
-                                            cornerRadius: 18
-                                        )
-                                        .fill(
-                                            Color.orange.opacity(0.15)
-                                        )
-                                        .frame(
-                                            width: 70,
-                                            height: 70
-                                        )
-                                        
-                                        if let imageData = dish.imageData,
-                                           let uiImage = UIImage(data: imageData) {
+                                        ZStack {
                                             
-                                            Image(uiImage: uiImage)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 70, height: 70)
-                                                .clipShape(
-                                                    RoundedRectangle(cornerRadius: 18)
-                                                )
+                                            RoundedRectangle(
+                                                cornerRadius: 18
+                                            )
+                                            .fill(
+                                                Color.orange.opacity(0.15)
+                                            )
+                                            .frame(
+                                                width: 70,
+                                                height: 70
+                                            )
                                             
-                                        } else {
-                                            
-                                            Image(systemName: "fork.knife")
-                                                .font(.title2)
-                                                .foregroundColor(.orange)
+                                            if let imageData = dish.imageData,
+                                               let uiImage = UIImage(data: imageData) {
+                                                
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 70, height: 70)
+                                                    .clipShape(
+                                                        RoundedRectangle(cornerRadius: 18)
+                                                    )
+                                                
+                                            } else {
+                                                
+                                                Image(systemName: "fork.knife")
+                                                    .font(.title2)
+                                                    .foregroundColor(.orange)
+                                            }
                                         }
+                                        
+                                        VStack(
+                                            alignment: .leading,
+                                            spacing: 6
+                                        ) {
+                                            
+                                            Text(dish.name)
+                                                .font(.headline)
+                                                .foregroundColor(.white)
+                                            
+                                            Text(
+                                                "\(Int(dish.outputQuantityInGrams)) г"
+                                            )
+                                            .foregroundColor(.orange)
+                                            
+                                            Text(
+                                                "\(dish.ingredients.count) ингредиентов"
+                                            )
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                        }
+                                        
+                                        Spacer()
                                     }
+                                    .padding()
+                                    .background(
+                                        Color.white.opacity(0.05)
+                                    )
+                                    .clipShape(
+                                        RoundedRectangle(cornerRadius: 24)
+                                    )
                                     
-                                    // INFO
+                                } else {
                                     
-                                    VStack(
-                                        alignment: .leading,
-                                        spacing: 6
-                                    ) {
+                                    // OWNER / ADMIN EDIT
+                                    
+                                    NavigationLink {
                                         
-                                        Text(dish.name)
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                        
-                                        Text(
-                                            "\(Int(dish.outputQuantityInGrams)) г"
+                                        DishBuilderView(
+                                            store: store,
+                                            editingDish: dish
                                         )
-                                        .foregroundColor(.orange)
                                         
-                                        Text(
-                                            "\(dish.ingredients.count) ингредиентов"
+                                    } label: {
+                                        
+                                        HStack(spacing: 16) {
+                                            
+                                            ZStack {
+                                                
+                                                RoundedRectangle(
+                                                    cornerRadius: 18
+                                                )
+                                                .fill(
+                                                    Color.orange.opacity(0.15)
+                                                )
+                                                .frame(
+                                                    width: 70,
+                                                    height: 70
+                                                )
+                                                
+                                                if let imageData = dish.imageData,
+                                                   let uiImage = UIImage(data: imageData) {
+                                                    
+                                                    Image(uiImage: uiImage)
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width: 70, height: 70)
+                                                        .clipShape(
+                                                            RoundedRectangle(cornerRadius: 18)
+                                                        )
+                                                    
+                                                } else {
+                                                    
+                                                    Image(systemName: "fork.knife")
+                                                        .font(.title2)
+                                                        .foregroundColor(.orange)
+                                                }
+                                            }
+                                            
+                                            VStack(
+                                                alignment: .leading,
+                                                spacing: 6
+                                            ) {
+                                                
+                                                Text(dish.name)
+                                                    .font(.headline)
+                                                    .foregroundColor(.white)
+                                                
+                                                Text(
+                                                    "\(Int(dish.outputQuantityInGrams)) г"
+                                                )
+                                                .foregroundColor(.orange)
+                                                
+                                                Text(
+                                                    "\(dish.ingredients.count) ингредиентов"
+                                                )
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "chevron.right")
+                                                .foregroundColor(.gray)
+                                        }
+                                        .padding()
+                                        .background(
+                                            Color.white.opacity(0.05)
                                         )
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
+                                        .clipShape(
+                                            RoundedRectangle(cornerRadius: 24)
+                                        )
                                     }
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray)
                                 }
-                                .padding()
-                                .background(
-                                    Color.white.opacity(0.05)
-                                )
-                                .clipShape(
-                                    RoundedRectangle(cornerRadius: 24)
-                                )
                             }
                         }
+                        .padding()
+                        .padding(.top, 60)
                     }
-                    .padding()
-                    .padding(.top, 60)
                 }
+                .toolbar(.hidden, for: .navigationBar)
             }
-            .toolbar(.hidden, for: .navigationBar)
-        }
-        .preferredColorScheme(.dark)
-        .alert("Ссылка скопирована", isPresented: $showLinkAlert) {
-            
-            Button("OK") { }
-            
-        } message: {
-            
-            Text(currentLink)
-        }
-        .sheet(isPresented: $showShare) {
-            
-            FoodShareSheet(
-                url: shareLink
-            )
-        }
-    }
-    
-    // MARK: - SHARE
-    
-    func shareMenu() {
-        
-        let service = MenuShareService()
-        
-        service.uploadMenu(
-            
-            dishes: store.dishes,
-            restaurantId: "demo_restaurant"
-            
-        ) { result in
-            
-            DispatchQueue.main.async {
+            .preferredColorScheme(.dark)
+            .alert("Ссылка скопирована", isPresented: $showLinkAlert) {
                 
-                switch result {
+                Button("OK") { }
+                
+            } message: {
+                
+                Text(currentLink)
+            }
+            .sheet(isPresented: $showShare) {
+                
+                FoodShareSheet(
+                    url: shareLink
+                )
+            }
+        }
+        
+        // MARK: - SHARE
+        
+        func shareMenu() {
+            
+            let service = MenuShareService()
+            
+            service.uploadMenu(
+                
+                dishes: store.dishes,
+                restaurantId: "demo_restaurant"
+                
+            ) { result in
+                
+                DispatchQueue.main.async {
                     
-                case .success(let link):
-                    
-                    currentLink = link
-                    
-                    UIPasteboard.general.string = link
-                    
-                    showLinkAlert = true
-                    
-                case .failure(let error):
-                    
-                    print(error.localizedDescription)
+                    switch result {
+                        
+                    case .success(let link):
+                        
+                        currentLink = link
+                        
+                        UIPasteboard.general.string = link
+                        
+                        showLinkAlert = true
+                        
+                    case .failure(let error):
+                        
+                        print(error.localizedDescription)
+                    }
                 }
             }
         }
     }
-}
+
