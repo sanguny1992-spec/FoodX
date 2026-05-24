@@ -148,6 +148,13 @@ struct EmployeesView: View {
                             
                             Text(employee.email)
                                 .foregroundColor(.gray)
+                            Text(employee.status.capitalized)
+                                .foregroundColor(
+                                    employee.status == "approved"
+                                    ? .green
+                                    : .orange
+                                )
+                                .font(.caption)
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
