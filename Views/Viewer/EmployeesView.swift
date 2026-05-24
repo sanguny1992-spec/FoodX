@@ -155,6 +155,39 @@ struct EmployeesView: View {
                                     : .orange
                                 )
                                 .font(.caption)
+
+                            if employee.status == "pending" {
+                                
+                                Button {
+                                    
+                                    service.approveEmployee(
+                                        restaurantId: restaurantId,
+                                        employeeId: employee.id
+                                    )
+                                    
+                                    loadEmployees()
+                                    
+                                } label: {
+                                    
+                                    Text("Approve")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.black)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(Color.green)
+                                        .clipShape(
+                                            RoundedRectangle(cornerRadius: 10)
+                                        )
+                                }
+                                .padding(.top, 4)
+                            }
+                            Text(employee.status.capitalized)
+                                .foregroundColor(
+                                    employee.status == "approved"
+                                    ? .green
+                                    : .orange
+                                )
+                                .font(.caption)
                         }
                         .padding()
                         .frame(maxWidth: .infinity)

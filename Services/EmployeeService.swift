@@ -84,4 +84,17 @@ final class EmployeeService {
                 completion(employees)
             }
     }
+    func approveEmployee(
+        restaurantId: String,
+        employeeId: String
+    ) {
+        
+        db.collection("restaurants")
+            .document(restaurantId)
+            .collection("employees")
+            .document(employeeId)
+            .updateData([
+                "status": "approved"
+            ])
+    }
 }
