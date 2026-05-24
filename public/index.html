@@ -1,62 +1,106 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>FoodX</title>
+<title>FoodX WEB</title>
 
 <style>
 
-body{
-    background:#111;
-    color:white;
-    font-family:sans-serif;
-    padding:20px;
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0f0f0f;
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    padding:20px;
 }
 
 h1{
-    margin-top:0;
+    margin-bottom:20px;
+    font-size:34px;
+}
+
+.topbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:24px;
+}
+
+.topbar button{
+    flex:1;
+    padding:14px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg,#ff9500,#ff5e3a);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+    font-size:15px;
 }
 
 .card{
-    background:#1f1f1f;
-    border-radius:18px;
-    padding:16px;
-    margin-bottom:14px;
-    color:white;
-    display:block;
+    background:#1b1b1b;
+    border-radius:24px;
+    padding:20px;
+    margin-bottom:18px;
+    border:1px solid rgba(255,255,255,0.06);
+    backdrop-filter:blur(12px);
 }
 
 .title{
-    font-size:22px;
-    font-weight:bold;
+    font-size:24px;
+    font-weight:700;
 }
 
 .category{
-    color:orange;
-    margin-top:4px;
+    color:#ff9500;
+    margin-top:6px;
 }
 
 .grams{
-    margin-top:8px;
-    opacity:0.8;
+    margin-top:10px;
+    opacity:0.7;
 }
 
-.ingredients{
-    margin-top:12px;
-    line-height:1.5;
-    opacity:0.9;
+.section{
+    margin-top:18px;
+}
+
+.section h3{
+    margin-bottom:10px;
+    color:#ff9500;
+}
+
+.ingredient{
+    background:#262626;
+    border-radius:14px;
+    padding:10px;
+    margin-bottom:8px;
 }
 
 .instruction{
-    margin-top:14px;
-    padding-top:12px;
-    border-top:1px solid #333;
-    line-height:1.5;
+    line-height:1.6;
+    opacity:0.92;
+}
+
+.search{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:18px;
+    background:#1d1d1d;
+    color:white;
+    margin-bottom:20px;
+    font-size:16px;
 }
 
 .calendar{
@@ -67,106 +111,87 @@ h1{
 }
 
 .day{
-    background:#222;
-    padding:12px;
-    border-radius:10px;
+    background:#1d1d1d;
+    border-radius:14px;
+    padding:14px;
     text-align:center;
 }
 
 .active{
-    background:green;
-}
-
-#topbar{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-}
-
-#topbar button{
-    flex:1;
-    background:orange;
+    background:#22c55e;
     color:black;
-    border:none;
-    padding:14px;
-    border-radius:14px;
-    font-weight:bold;
-    font-size:16px;
-    cursor:pointer;
+    font-weight:700;
 }
 
-.searchInput{
+.select{
     width:100%;
-    padding:14px;
-    border-radius:14px;
+    padding:16px;
     border:none;
-    background:#1f1f1f;
+    border-radius:18px;
+    background:#1d1d1d;
     color:white;
+    margin-bottom:16px;
     font-size:16px;
-    margin-bottom:20px;
-    box-sizing:border-box;
 }
 
-#categories{
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    margin-bottom:20px;
+.login{
+    max-width:420px;
+    margin:100px auto;
 }
 
-#categories button{
-    background:orange;
-    color:black;
-    border:none;
-    padding:10px 16px;
-    border-radius:20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-select{
+.login button{
     width:100%;
-    padding:14px;
-    border-radius:14px;
+    padding:16px;
     border:none;
-    background:#1f1f1f;
+    border-radius:18px;
+    background:linear-gradient(135deg,#ff9500,#ff5e3a);
     color:white;
-    font-size:16px;
-    margin-bottom:14px;
+    font-weight:700;
+    font-size:17px;
+    cursor:pointer;
 }
 
-.backButton{
-    background:orange;
-    color:black;
-    border:none;
-    padding:12px 18px;
-    border-radius:12px;
-    font-weight:bold;
-    margin-bottom:20px;
-    cursor:pointer;
+.error{
+    color:#ff453a;
+    margin-top:16px;
+}
+
+.loading{
+    text-align:center;
+    margin-top:120px;
+    opacity:0.5;
+    font-size:22px;
 }
 
 </style>
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
 import {
     getFirestore,
     doc,
-    getDoc
-}
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 const firebaseConfig = {
 
-    apiKey: "YOUR_API_KEY",
+    apiKey: "AIzaSyCbu1jS4WTke68HfYr_Oo9hGriOGJ6b8MM",
+
     authDomain: "foodxnew.firebaseapp.com",
+
     projectId: "foodxnew",
+
     storageBucket: "foodxnew.firebasestorage.app",
+
     messagingSenderId: "854058063966",
+
     appId: "1:854058063966:web:97ef85b42195c6ff687ccf"
 };
 
@@ -174,570 +199,424 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-// TOPBAR
+const auth = getAuth(app);
 
-function renderTopbar() {
+const restaurantId = "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
+
+let menuUnsubscribe = null;
+let semiUnsubscribe = null;
+let scheduleUnsubscribe = null;
+
+function renderTopbar(){
 
     return `
-
-        <div id="topbar">
-
-            <button id="menuTab">
-                Меню
-            </button>
-
-            <button id="scheduleTab">
-                График
-            </button>
-
-            <button id="semiTab">
-                Полуфабрикаты
-            </button>
-
+        <div class="topbar">
+            <button onclick="loadMenu()">Меню</button>
+            <button onclick="loadSemi()">Полуфабрикаты</button>
+            <button onclick="loadSchedule()">График</button>
         </div>
     `;
 }
 
-// ACTIONS
+// LOGIN
 
-function bindTopbar() {
+function showLogin(){
 
-    document
-        .getElementById("menuTab")
-        .onclick = () => {
+    document.body.innerHTML = `
 
-            loadMenu("main");
-        };
+        <div class="login">
 
-    document
-        .getElementById("scheduleTab")
-        .onclick = () => {
+            <h1>FoodX WEB</h1>
 
-            loadSchedule("main");
-        };
+            <input id="email" class="search" placeholder="Email">
 
-    document
-        .getElementById("semiTab")
-        .onclick = () => {
+            <input id="password" type="password" class="search" placeholder="Password">
 
-            loadSemi("main");
-        };
+            <button id="loginBtn">Войти</button>
+
+            <div id="error" class="error"></div>
+
+        </div>
+    `;
+
+    document.getElementById("loginBtn").onclick = login;
+}
+
+async function login(){
+
+    const email = document.getElementById("email").value;
+
+    const password = document.getElementById("password").value;
+
+    try{
+
+        const result = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        const uid = result.user.uid;
+
+        const employeeRef = doc(
+            db,
+            "restaurants",
+            restaurantId,
+            "employees",
+            uid
+        );
+
+        onSnapshot(employeeRef, snap => {
+
+            if(!snap.exists()){
+
+                document.getElementById("error").innerText =
+                    "Сотрудник не найден";
+
+                return;
+            }
+
+            const employee = snap.data();
+
+            if(employee.status !== "approved"){
+
+                document.getElementById("error").innerText =
+                    "Доступ не подтвержден";
+
+                return;
+            }
+
+            loadMenu();
+        });
+
+    }catch(error){
+
+        document.getElementById("error").innerText = error.message;
+    }
 }
 
 // MENU
 
-async function loadMenu(menuId) {
+window.loadMenu = function(){
 
-    const ref =
-        doc(db, "menus", menuId);
+    if(menuUnsubscribe) menuUnsubscribe();
 
-    const snap =
-        await getDoc(ref);
+    const ref = doc(db,"menus","main");
 
-    if (!snap.exists()) {
+    menuUnsubscribe = onSnapshot(ref,snap => {
 
-        document.body.innerHTML =
-            "<h1>Меню не найдено</h1>";
+        if(!snap.exists()){
 
-        return;
-    }
-
-    const data = snap.data();
-
-    document.body.innerHTML = `
-
-        ${renderTopbar()}
-
-        <h1>Меню</h1>
-
-        <input
-            id="menuSearch"
-            class="searchInput"
-            placeholder="Поиск блюда..."
-        />
-
-        <div id="categories"></div>
-
-        <div id="menu-list"></div>
-    `;
-
-    bindTopbar();
-
-    const categoriesContainer =
-        document.getElementById(
-            "categories"
-        );
-
-    const menuContainer =
-        document.getElementById(
-            "menu-list"
-        );
-
-    const categories = [
-
-        "Все",
-
-        ...new Set(
-            data.dishes.map(
-                d => d.category
-            )
-        )
-    ];
-
-    let selectedCategory = "Все";
-    let searchText = "";
-
-    function renderDishes() {
-
-        menuContainer.innerHTML = "";
-
-        const filtered =
-            data.dishes.filter(d => {
-
-                const matchCategory =
-                    selectedCategory === "Все"
-                    || d.category === selectedCategory;
-
-                const matchSearch =
-                    d.name
-                    .toLowerCase()
-                    .includes(searchText.toLowerCase());
-
-                return matchCategory && matchSearch;
-            });
-
-        filtered.forEach(dish => {
-
-            menuContainer.innerHTML += `
-
-                <div
-                    class="card"
-                    onclick="
-                        loadDish(
-                            'main',
-                            '${dish.id}'
-                        )
-                    "
-                >
-
-                    <div class="title">
-                        ${dish.name}
-                    </div>
-
-                    <div class="category">
-                        ${dish.category}
-                    </div>
-
-                    <div class="grams">
-                        ${dish.grams || 0} г
-                    </div>
-
-                </div>
-            `;
-        });
-    }
-
-    categories.forEach(category => {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.innerText =
-            category;
-
-        button.onclick = () => {
-
-            selectedCategory =
-                category;
-
-            renderDishes();
-        };
-
-        categoriesContainer
-            .appendChild(button);
-    });
-
-    renderDishes();
-
-    document
-        .getElementById("menuSearch")
-        .addEventListener("input", e => {
-
-            searchText = e.target.value;
-
-            renderDishes();
-        });
-}
-
-// DISH
-
-window.loadDish = async function(
-    menuId,
-    dishId
-) {
-
-    const ref =
-        doc(db, "menus", menuId);
-
-    const snap =
-        await getDoc(ref);
-
-    const data = snap.data();
-
-    const dish =
-        data.dishes.find(
-            d => d.id === dishId
-        );
-
-    let ingredientsHTML = "";
-
-    (dish.ingredients || []).forEach(item => {
-
-        ingredientsHTML += `
-
-            <div class="card">
-                ${item}
-            </div>
-        `;
-    });
-
-    document.body.innerHTML = `
-
-        ${renderTopbar()}
-
-        <button
-            class="backButton"
-            onclick="loadMenu('main')"
-        >
-            ← Назад
-        </button>
-
-        <h1>${dish.name}</h1>
-
-        <div class="category">
-            ${dish.category}
-        </div>
-
-        <div class="grams">
-            ${dish.grams || 0} г
-        </div>
-
-        <h2>Ингредиенты</h2>
-
-        ${ingredientsHTML}
-
-        <h2>Приготовление</h2>
-
-        <div class="card instruction">
-
-            ${dish.instruction || "Нет описания"}
-
-        </div>
-    `;
-
-    bindTopbar();
-}
-
-// SCHEDULE
-
-async function loadSchedule(scheduleId) {
-
-    const ref =
-        doc(db, "schedules", scheduleId);
-
-    const snap =
-        await getDoc(ref);
-
-    if (!snap.exists()) {
-
-        document.body.innerHTML =
-            "<h1>График не найден</h1>";
-
-        return;
-    }
-
-    const data = snap.data();
-
-    const employees =
-        data.employees || [];
-
-    if (employees.length === 0) {
-
-        document.body.innerHTML =
-            "<h1>Нет сотрудников</h1>";
-
-        return;
-    }
-
-    let selectedEmployee =
-        employees[0];
-
-    let selectedMonth = "";
-
-    document.body.innerHTML = `
-
-        ${renderTopbar()}
-
-        <h1>График работы</h1>
-
-        <select id="employeeSelect"></select>
-
-        <select id="monthSelect"></select>
-
-        <div id="calendar"></div>
-    `;
-
-    bindTopbar();
-
-    const employeeSelect =
-        document.getElementById(
-            "employeeSelect"
-        );
-
-    const monthSelect =
-        document.getElementById(
-            "monthSelect"
-        );
-
-    const calendar =
-        document.getElementById(
-            "calendar"
-        );
-
-    employees.forEach((emp, index) => {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value = index;
-
-        option.textContent =
-            emp.name;
-
-        employeeSelect
-            .appendChild(option);
-    });
-
-    function renderMonths() {
-
-        monthSelect.innerHTML = "";
-
-        const monthDays =
-            selectedEmployee.monthDays || {};
-
-        const months =
-            Object.keys(monthDays);
-
-        if (months.length === 0) {
-
-            calendar.innerHTML =
-                "<p>Нет отмеченных смен</p>";
+            document.body.innerHTML =
+                `<div class="loading">Меню пустое</div>`;
 
             return;
         }
 
-        selectedMonth = months[0];
+        const data = snap.data();
 
-        months.forEach(month => {
+        const dishes = data.dishes || [];
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        document.body.innerHTML = `
 
-            option.value = month;
+            ${renderTopbar()}
 
-            option.textContent =
-                month;
+            <h1>Меню</h1>
 
-            monthSelect
-                .appendChild(option);
-        });
+            <input id="search" class="search" placeholder="Поиск блюда">
 
-        monthSelect.value =
-            selectedMonth;
+            <div id="content"></div>
+        `;
 
-        renderCalendar();
-    }
+        const content = document.getElementById("content");
 
-    function renderCalendar() {
+        const search = document.getElementById("search");
 
-        const monthDays =
-            selectedEmployee.monthDays || {};
+        function render(filter = ""){
 
-        const activeDays =
-            monthDays[selectedMonth] || [];
+            content.innerHTML = "";
 
-        let html =
-            `<div class="calendar">`;
+            dishes
+                .filter(d =>
+                    d.name.toLowerCase()
+                    .includes(filter.toLowerCase())
+                )
+                .forEach(dish => {
 
-        for (let i = 1; i <= 31; i++) {
+                let ingredientsHTML = "";
 
-            html += `
+                (dish.ingredients || []).forEach(i => {
 
-                <div class="
-                    day
-                    ${activeDays.includes(i)
-                        ? "active"
-                        : ""}
-                ">
-                    ${i}
-                </div>
-            `;
-        }
+                    ingredientsHTML += `
+                        <div class="ingredient">
+                            ${i.name} — ${i.grams} г
+                        </div>
+                    `;
+                });
 
-        html += `</div>`;
-
-        calendar.innerHTML = html;
-    }
-
-    employeeSelect.onchange = () => {
-
-        selectedEmployee =
-            employees[
-                employeeSelect.value
-            ];
-
-        renderMonths();
-    };
-
-    monthSelect.onchange = () => {
-
-        selectedMonth =
-            monthSelect.value;
-
-        renderCalendar();
-    };
-
-    renderMonths();
-}
-
-// SEMI
-
-async function loadSemi(semiId) {
-
-    const ref =
-        doc(db, "semi", semiId);
-
-    const snap =
-        await getDoc(ref);
-
-    if (!snap.exists()) {
-
-        document.body.innerHTML =
-            "<h1>Полуфабрикаты не найдены</h1>";
-
-        return;
-    }
-
-    const data = snap.data();
-
-    const semiProducts =
-        data.semiProducts || [];
-
-    document.body.innerHTML = `
-
-        ${renderTopbar()}
-
-        <h1>Полуфабрикаты</h1>
-
-        <input
-            id="semiSearch"
-            class="searchInput"
-            placeholder="Поиск полуфабриката..."
-        />
-
-        <div id="semi-list"></div>
-    `;
-
-    bindTopbar();
-
-    const container =
-        document.getElementById(
-            "semi-list"
-        );
-
-    const searchInput =
-        document.getElementById(
-            "semiSearch"
-        );
-
-    function renderSemi(search = "") {
-
-        container.innerHTML = "";
-
-        const filtered =
-            semiProducts.filter(semi =>
-                semi.name
-                    .toLowerCase()
-                    .includes(search.toLowerCase())
-            );
-
-        filtered.forEach(semi => {
-
-            let ingredientsHTML = "";
-
-            (semi.ingredients || []).forEach(item => {
-
-                ingredientsHTML += `
+                content.innerHTML += `
 
                     <div class="card">
-                        ${item.name}
-                        —
-                        ${item.grams} г
+
+                        <div class="title">${dish.name}</div>
+
+                        <div class="category">
+                            ${dish.category || "Без категории"}
+                        </div>
+
+                        <div class="grams">
+                            ${dish.grams || 0} г
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Ингредиенты</h3>
+
+                            ${ingredientsHTML}
+
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Технология</h3>
+
+                            <div class="instruction">
+                                ${dish.instruction || "Нет описания"}
+                            </div>
+
+                        </div>
+
                     </div>
                 `;
             });
+        }
 
-            container.innerHTML += `
+        render();
 
-                <div class="card">
-
-                    <div class="title">
-                        ${semi.name}
-                    </div>
-
-                    <div class="grams">
-                        Выход:
-                        ${semi.grams || 0} г
-                    </div>
-
-                    <div class="ingredients">
-
-                        <h3>Ингредиенты</h3>
-
-                        ${ingredientsHTML}
-
-                    </div>
-
-                    <div class="instruction">
-
-                        <h3>Технология</h3>
-
-                        ${semi.instruction || "Нет описания"}
-
-                    </div>
-
-                </div>
-            `;
-        });
-    }
-
-    renderSemi();
-
-    searchInput.addEventListener("input", e => {
-
-        renderSemi(e.target.value);
+        search.oninput = e => {
+            render(e.target.value);
+        };
     });
-}
+};
 
-// START
+// SEMI
 
-loadMenu("main");
+window.loadSemi = function(){
+
+    if(semiUnsubscribe) semiUnsubscribe();
+
+    const ref = doc(db,"semi","main");
+
+    semiUnsubscribe = onSnapshot(ref,snap => {
+
+        if(!snap.exists()){
+
+            document.body.innerHTML =
+                `<div class="loading">Нет полуфабрикатов</div>`;
+
+            return;
+        }
+
+        const data = snap.data();
+
+        const semiProducts = data.semiProducts || [];
+
+        document.body.innerHTML = `
+
+            ${renderTopbar()}
+
+            <h1>Полуфабрикаты</h1>
+
+            <input id="search" class="search" placeholder="Поиск">
+
+            <div id="content"></div>
+        `;
+
+        const content = document.getElementById("content");
+
+        function render(filter = ""){
+
+            content.innerHTML = "";
+
+            semiProducts
+                .filter(s =>
+                    s.name.toLowerCase()
+                    .includes(filter.toLowerCase())
+                )
+                .forEach(semi => {
+
+                let ingredientsHTML = "";
+
+                (semi.ingredients || []).forEach(i => {
+
+                    ingredientsHTML += `
+                        <div class="ingredient">
+                            ${i.name} — ${i.grams} г
+                        </div>
+                    `;
+                });
+
+                content.innerHTML += `
+
+                    <div class="card">
+
+                        <div class="title">${semi.name}</div>
+
+                        <div class="grams">
+                            Выход: ${semi.grams || 0} г
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Ингредиенты</h3>
+
+                            ${ingredientsHTML}
+
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Технология</h3>
+
+                            <div class="instruction">
+                                ${semi.instruction || "Нет описания"}
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        render();
+
+        document.getElementById("search").oninput = e => {
+            render(e.target.value);
+        };
+    });
+};
+
+// SCHEDULE
+
+window.loadSchedule = function(){
+
+    if(scheduleUnsubscribe) scheduleUnsubscribe();
+
+    const ref = doc(db,"schedules","main");
+
+    scheduleUnsubscribe = onSnapshot(ref,snap => {
+
+        if(!snap.exists()){
+
+            document.body.innerHTML =
+                `<div class="loading">Нет графика</div>`;
+
+            return;
+        }
+
+        const data = snap.data();
+
+        const employees = data.employees || [];
+
+        document.body.innerHTML = `
+
+            ${renderTopbar()}
+
+            <h1>График</h1>
+
+            <select id="employee" class="select"></select>
+
+            <select id="month" class="select"></select>
+
+            <div id="calendar"></div>
+        `;
+
+        const employeeSelect =
+            document.getElementById("employee");
+
+        const monthSelect =
+            document.getElementById("month");
+
+        const calendar =
+            document.getElementById("calendar");
+
+        employees.forEach((emp,index) => {
+
+            const option = document.createElement("option");
+
+            option.value = index;
+
+            option.textContent = emp.name;
+
+            employeeSelect.appendChild(option);
+        });
+
+        let currentEmployee = employees[0];
+
+        function renderMonths(){
+
+            monthSelect.innerHTML = "";
+
+            const months =
+                Object.keys(currentEmployee.monthDays || {});
+
+            months.forEach(month => {
+
+                const option = document.createElement("option");
+
+                option.value = month;
+
+                option.textContent = month;
+
+                monthSelect.appendChild(option);
+            });
+
+            renderCalendar();
+        }
+
+        function renderCalendar(){
+
+            const selectedMonth =
+                monthSelect.value;
+
+            const activeDays =
+                currentEmployee.monthDays?.[selectedMonth] || [];
+
+            let html = `<div class="calendar">`;
+
+            for(let i=1;i<=31;i++){
+
+                html += `
+                    <div class="
+                        day
+                        ${activeDays.includes(i) ? "active" : ""}
+                    ">
+                        ${i}
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+
+            calendar.innerHTML = html;
+        }
+
+        employeeSelect.onchange = () => {
+
+            currentEmployee =
+                employees[employeeSelect.value];
+
+            renderMonths();
+        };
+
+        monthSelect.onchange = renderCalendar;
+
+        renderMonths();
+    });
+};
+
+showLogin();
 
 </script>
 
@@ -745,8 +624,11 @@ loadMenu("main");
 
 <body>
 
-<h1>Загрузка...</h1>
+<div class="loading">
+    Загрузка...
+</div>
 
 </body>
 
 </html>
+```

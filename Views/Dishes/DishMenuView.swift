@@ -349,7 +349,7 @@ struct DishMenuView: View {
             service.uploadMenu(
                 
                 dishes: store.dishes,
-                restaurantId: "demo_restaurant"
+                restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
                 
             ) { result in
                 
