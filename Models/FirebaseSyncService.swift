@@ -21,7 +21,7 @@ final class FirebaseSyncService {
 
     // MARK: - MENU
 
-    private func uploadMenu(dishes: [Dish]) {
+func uploadMenu(dishes: [Dish]) {
 
         let mapped: [[String: Any]] = dishes.map { dish in
 
@@ -52,7 +52,7 @@ final class FirebaseSyncService {
 
     // MARK: - SEMI
 
-    private func uploadSemiProducts(
+    func uploadSemiProducts(
         _ semiProducts: [SemiFinishedProduct]
     ) {
 

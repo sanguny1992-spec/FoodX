@@ -1,162 +1,176 @@
-
-//
-//  ContentView.swift
-//
-
 import SwiftUI
 import FirebaseFirestore
 
 struct ContentView: View {
-
+    
     @EnvironmentObject var auth: AuthManager
-
+    
     @StateObject var store = InventoryStore()
-
+    
     @State private var showMenu = false
     @State private var showSchedule = false
-
+    
     @State private var searchText = ""
-
+    
     @State private var name = ""
     @State private var qty = ""
     @State private var price = ""
-
+    
     @State private var type: AddTarget = .stock
-
+    
     @State private var showSyncAlert = false
     @State private var syncMessage = ""
-
+    
     @FocusState private var focusedField: Field?
-
+    
     enum Field {
         case name, qty, price
     }
-
+    
     var body: some View {
-
+        
         NavigationStack {
-
+            
             ZStack {
-
+                
+                // BACKGROUND
+                
                 Image("FoodX")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
-
+                
                 Color.black.opacity(0.55)
                     .ignoresSafeArea()
-
+                
                 ScrollView(showsIndicators: false) {
-
-                    VStack(spacing: 0) {
-
-                        VStack(spacing: 10) {
-
+                    
+                    VStack(spacing: 18) {
+                        
+                        // TOP PANEL
+                        
+                        VStack(spacing: 14) {
+                            
                             HStack {
-
+                                
                                 HStack(spacing: 6) {
-
+                                    
                                     Image(systemName: "sparkles")
                                         .font(.caption2)
                                         .foregroundColor(.white.opacity(0.35))
-
+                                    
                                     Text("By Zabredun")
                                         .font(.caption)
                                         .foregroundColor(.white.opacity(0.35))
                                         .italic()
                                 }
-
+                                
                                 Spacer()
-
+                                
+                                // 🚚 ПОСТАВЩИКИ
+                                
                                 NavigationLink {
-
+                                    
                                     SuppliersView()
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "truck.box.fill")
                                         .font(.title2)
                                         .foregroundColor(.cyan)
                                 }
-
+                                
+                                // 🛒 ЗАКАЗЫ
+                                
                                 NavigationLink {
-
+                                    
                                     CreateOrderView(
                                         inventoryStore: store
                                     )
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "cart.fill")
                                         .font(.title2)
                                         .foregroundColor(.green)
                                 }
-
+                                
+                                // 📜 ИСТОРИЯ
+                                
                                 NavigationLink {
-
+                                    
                                     OrdersHistoryView(
                                         inventoryStore: store
                                     )
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "clock.arrow.circlepath")
                                         .font(.title2)
                                         .foregroundColor(.yellow)
                                 }
-
+                                
+                                // 🍳 МЕНЮ
+                                
                                 Button {
-
+                                    
                                     showMenu = true
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "menucard.fill")
                                         .font(.title2)
                                         .foregroundColor(.orange)
                                 }
-
+                                
+                                // 📅 ГРАФИК
+                                
                                 Button {
-
+                                    
                                     showSchedule = true
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "calendar")
                                         .font(.title2)
                                         .foregroundColor(.blue)
                                 }
-
+                                
                                 // ☁️ WEB SYNC
-
+                                
                                 Button {
-
+                                    
                                     syncWeb()
-
+                                    
                                 } label: {
-
+                                    
                                     Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                                         .font(.title2)
                                         .foregroundColor(.purple)
                                 }
                             }
-                            .padding(.top, 8)
-
+                            
+                            // НАЗВАНИЕ
+                            
                             glassField(
                                 "Название",
                                 text: $name
                             )
                             .focused($focusedField, equals: .name)
-
+                            
+                            // ГРАММЫ
+                            
                             glassField(
                                 "Граммы",
                                 text: $qty
                             )
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: .qty)
-
+                            
+                            // ЦЕНА
+                            
                             if type == .stock {
-
+                                
                                 glassField(
                                     "Цена за кг",
                                     text: $price
@@ -164,23 +178,27 @@ struct ContentView: View {
                                 .keyboardType(.decimalPad)
                                 .focused($focusedField, equals: .price)
                             }
-
+                            
+                            // PICKER
+                            
                             Picker("", selection: $type) {
-
+                                
                                 ForEach(AddTarget.allCases, id: \.self) { item in
-
+                                    
                                     Text(item.rawValue)
                                 }
                             }
                             .pickerStyle(.segmented)
                             .tint(.orange)
-
+                            
+                            // ДОБАВИТЬ
+                            
                             Button {
-
+                                
                                 add()
-
+                                
                             } label: {
-
+                                
                                 Text("Добавить")
                                     .font(.headline)
                                     .foregroundColor(.white)
@@ -194,45 +212,48 @@ struct ContentView: View {
                                         )
                                     )
                                     .clipShape(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 18)
                                     )
                             }
                         }
                         .padding()
-                        .background(.ultraThinMaterial.opacity(0.85))
+                        .background(.ultraThinMaterial.opacity(0.9))
                         .clipShape(
-                            RoundedRectangle(cornerRadius: 20)
+                            RoundedRectangle(cornerRadius: 24)
                         )
                         .padding(.horizontal)
                         .padding(.top, 90)
-
+                        
+                        // ПОИСК
+                        
                         TextField("Поиск...", text: $searchText)
-                            .padding(12)
+                            .padding(14)
                             .background(
                                 Color.white.opacity(0.08)
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: 14)
+                                RoundedRectangle(cornerRadius: 16)
                             )
                             .foregroundColor(.white)
                             .padding(.horizontal)
-                            .padding(.top, 12)
-
+                        
+                        // СПИСОК
+                        
                         VStack(spacing: 12) {
-
+                            
                             switch type {
-
+                                
                             case .stock:
-
+                                
                                 ForEach($store.products) { $product in
-
+                                    
                                     ProductRow(product: $product)
                                 }
-
+                                
                             case .semi:
-
+                                
                                 ForEach(filteredSemiProducts) { semi in
-
+                                    
                                     SemiRow(
                                         store: store,
                                         semi: semi
@@ -241,36 +262,6 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.top, 14)
-
-                        NavigationLink {
-
-                            EmployeesView(
-                                restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
-                            )
-
-                        } label: {
-
-                            VStack(spacing: 8) {
-
-                                Image(systemName: "person.3.fill")
-                                    .font(.system(size: 28))
-
-                                Text("Сотрудники")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                Color.white.opacity(0.06)
-                            )
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 24)
-                            )
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 20)
                         .padding(.bottom, 40)
                     }
                 }
@@ -278,163 +269,175 @@ struct ContentView: View {
             }
             .preferredColorScheme(.dark)
             .ignoresSafeArea(.keyboard)
-
+            
             .onTapGesture {
-
+                
                 hideKeyboard()
                 focusedField = nil
             }
-
+            
+            // TOOLBAR
+            
             .toolbar {
-
-                ToolbarItem(placement: .topBarLeading) {
-
-                    HStack(spacing: 10) {
-
-                        Button {
-
-                            auth.signOut()
-
-                        } label: {
-
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .foregroundColor(.red)
-                        }
-
-                        Text("By Zabredun")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.35))
-                            .italic()
+                
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    
+                    // ВЫХОД
+                    
+                    Button {
+                        
+                        auth.signOut()
+                        
+                    } label: {
+                        
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .foregroundColor(.red)
+                    }
+                    
+                    // СОТРУДНИКИ
+                    
+                    NavigationLink {
+                        
+                        EmployeesView(
+                            restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+                        )
+                        
+                    } label: {
+                        
+                        Image(systemName: "person.3.fill")
+                            .foregroundColor(.purple)
                     }
                 }
             }
-
+            
+            // MENU
+            
             .sheet(isPresented: $showMenu) {
-
+                
                 DishMenuView(store: store)
                     .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
             }
-
+            
+            // SCHEDULE
+            
             .sheet(isPresented: $showSchedule) {
-
+                
                 WorkScheduleView()
             }
-
+            
+            // ALERT
+            
             .alert(
                 "FoodX WEB",
                 isPresented: $showSyncAlert
             ) {
-
+                
                 Button("OK") { }
-
+                
             } message: {
-
+                
                 Text(syncMessage)
             }
         }
     }
-
-    // MARK: - SYNC WEB
-
+    
+    // MARK: - WEB SYNC
+    
     func syncWeb() {
-
-      
-        FirebaseSyncService.shared.syncAll(
-            dishes: store.dishes,
-            semiProducts: store.semiProducts
+        
+        FirebaseSyncService.shared.uploadMenu(
+            dishes: store.dishes
         )
-      
-
-
+        
+        FirebaseSyncService.shared.uploadSemiProducts(
+            store.semiProducts
+        )
+        
         syncMessage = "WEB версия обновлена 🚀"
         showSyncAlert = true
     }
-
+    
     // MARK: - ADD
-
+    
     func add() {
-
+        
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
             return
         }
-
+        
         guard let q = Double(
             qty.replacingOccurrences(of: ",", with: ".")
         ) else {
             return
         }
-
+        
         switch type {
-
+            
         case .stock:
-
+            
             let pr = Double(
                 price.replacingOccurrences(of: ",", with: ".")
             )
-
+            
             let product = Product(
                 name: name,
                 quantityInGrams: q,
                 pricePerKg: pr
             )
-
+            
             store.products.append(product)
-
+            
         case .semi:
-
+            
             let semi = SemiFinishedProduct(
                 name: name,
                 outputQuantityInGrams: q,
                 ingredients: [],
                 instruction: ""
             )
-
+            
             store.semiProducts.append(semi)
         }
-
+        
         store.save()
-
+        
         name = ""
         qty = ""
         price = ""
-
+        
         focusedField = nil
-
+        
         hideKeyboard()
     }
-
+    
     // MARK: - FILTER
-
+    
     var filteredSemiProducts: [SemiFinishedProduct] {
-
+        
         searchText.isEmpty
         ? store.semiProducts
         : store.semiProducts.filter {
-
             $0.name.lowercased().contains(
                 searchText.lowercased()
             )
         }
     }
-
+    
     // MARK: - UI
-
+    
     func glassField(
         _ placeholder: String,
         text: Binding<String>
     ) -> some View {
-
+        
         TextField(placeholder, text: text)
-            .padding(12)
+            .padding(14)
             .background(
                 Color.white.opacity(0.08)
             )
             .clipShape(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: 16)
             )
             .foregroundColor(.white)
     }
 }
-
-
