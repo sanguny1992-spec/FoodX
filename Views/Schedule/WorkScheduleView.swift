@@ -60,7 +60,16 @@ struct WorkScheduleView: View {
                             WorkEmployee(name: name)
                         )
                         
+                        // LOCAL SAVE
+                        
                         storage.save(employees)
+                        
+                        // FIREBASE REALTIME
+                        
+                        ScheduleShareService()
+                            .uploadSchedule(
+                                employees: employees
+                            ) { _ in }
                         
                         name = ""
                     }
@@ -80,7 +89,16 @@ struct WorkScheduleView: View {
                                 employee: $emp
                             ) {
                                 
+                                // LOCAL SAVE
+                                
                                 storage.save(employees)
+                                
+                                // FIREBASE REALTIME
+                                
+                                ScheduleShareService()
+                                    .uploadSchedule(
+                                        employees: employees
+                                    ) { _ in }
                             }
                             
                         } label: {

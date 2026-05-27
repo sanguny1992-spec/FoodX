@@ -6,9 +6,7 @@ struct EmployeeManagerView: View {
     let restaurantId: String
     
     @State private var employees: [EmployeeModel] = []
-    
     @State private var showCreateEmployee = false
-    
     @State private var selectedEmployee: EmployeeModel?
     
     private let db = Firestore.firestore()
@@ -87,6 +85,21 @@ struct EmployeeManagerView: View {
         .onAppear {
             
             fetchEmployees()
+        }
+        .toolbar {
+
+            ToolbarItem(placement: .topBarTrailing) {
+
+                Button {
+
+                    showCreateEmployee = true
+
+                } label: {
+
+                    Image(systemName: "person.badge.plus")
+                        .foregroundColor(.green)
+                }
+            }
         }
         
         // CREATE

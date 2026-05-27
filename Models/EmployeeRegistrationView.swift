@@ -120,6 +120,7 @@ struct EmployeeRegistrationView: View {
                 Text(alertText)
             }
         }
+        
     }
 
     // MARK: - CREATE

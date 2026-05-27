@@ -9,6 +9,8 @@ struct EmployeesView: View {
     @State private var inviteCode = ""
     @State private var showInviteAlert = false
     
+    @State private var showCreateEmployee = false
+    
     private let inviteService = InviteService()
     
     private let service = EmployeeService()
@@ -29,29 +31,11 @@ struct EmployeesView: View {
                         .foregroundColor(.white)
                         .padding(.top)
                     
-                    // MARK: - Invite Button
+                    // MARK: - CREATE EMPLOYEE
                     
                     Button {
                         
-                        inviteService.createInvite(
-                            restaurantId: restaurantId
-                        ) { result in
-                            
-                            switch result {
-                                
-                            case .success(let code):
-                                
-                                DispatchQueue.main.async {
-                                    
-                                    inviteCode = code
-                                    showInviteAlert = true
-                                }
-                                
-                            case .failure(let error):
-                                
-                                print(error.localizedDescription)
-                            }
-                        }
+                        showCreateEmployee = true
                         
                     } label: {
                         
@@ -59,7 +43,7 @@ struct EmployeesView: View {
                             
                             Image(systemName: "person.badge.plus")
                             
-                            Text("Создать приглашение")
+                            Text("Создать сотрудника")
                                 .fontWeight(.bold)
                         }
                         .foregroundColor(.black)
@@ -72,20 +56,29 @@ struct EmployeesView: View {
                     }
                     .padding(.bottom, 10)
                     
-                    // MARK: - Employees
+                    // MARK: - EMPLOYEES
                     
                     ForEach(employees) { employee in
                         
                         VStack(
                             alignment: .leading,
-                            spacing: 8
+                            spacing: 12
                         ) {
                             
                             HStack {
                                 
-                                Text(employee.name)
-                                    .font(.headline)
-                                    .foregroundColor(.white)
+                                VStack(
+                                    alignment: .leading,
+                                    spacing: 6
+                                ) {
+                                    
+                                    Text(employee.name)
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    
+                                    Text(employee.email)
+                                        .foregroundColor(.gray)
+                                }
                                 
                                 Spacer()
                                 
@@ -146,10 +139,21 @@ struct EmployeesView: View {
                                 }
                             }
                             
-                            Text(employee.email)
+                            // STATUS
+                            
+                            Text(employee.status.capitalized)
+                                .foregroundColor(
+                                    employee.status == "approved"
+                                    ? .green
+                                    : employee.status == "blocked"
+                                    ? .red
+                                    : .orange
+                                )
+                                .font(.caption.bold())
+                            
+                            // ACTIONS
+                            
                             HStack(spacing: 10) {
-                                
-                                // APPROVE
                                 
                                 if employee.status == "pending" {
                                     
@@ -174,8 +178,6 @@ struct EmployeesView: View {
                                     }
                                 }
                                 
-                                // BLOCK
-                                
                                 if employee.status == "approved" {
                                     
                                     Button {
@@ -198,8 +200,6 @@ struct EmployeesView: View {
                                             .clipShape(Capsule())
                                     }
                                 }
-                                
-                                // UNBLOCK
                                 
                                 if employee.status == "blocked" {
                                     
@@ -224,7 +224,7 @@ struct EmployeesView: View {
                                     }
                                 }
                                 
-                                // DELETE
+                                Spacer()
                                 
                                 Button {
                                     
@@ -241,48 +241,6 @@ struct EmployeesView: View {
                                         .foregroundColor(.red)
                                 }
                             }
-                            .padding(.top, 8)
-                                .foregroundColor(.gray)
-                            Text(employee.status.capitalized)
-                                .foregroundColor(
-                                    employee.status == "approved"
-                                    ? .green
-                                    : .orange
-                                )
-                                .font(.caption)
-
-                            if employee.status == "pending" {
-                                
-                                Button {
-                                    
-                                    service.approveEmployee(
-                                        restaurantId: restaurantId,
-                                        employeeId: employee.id
-                                    )
-                                    
-                                    loadEmployees()
-                                    
-                                } label: {
-                                    
-                                    Text("Approve")
-                                        .font(.caption.bold())
-                                        .foregroundColor(.black)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.green)
-                                        .clipShape(
-                                            RoundedRectangle(cornerRadius: 10)
-                                        )
-                                }
-                                .padding(.top, 4)
-                            }
-                            Text(employee.status.capitalized)
-                                .foregroundColor(
-                                    employee.status == "approved"
-                                    ? .green
-                                    : .orange
-                                )
-                                .font(.caption)
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -299,6 +257,19 @@ struct EmployeesView: View {
                 .padding()
             }
         }
+        .preferredColorScheme(.dark)
+        
+        // CREATE EMPLOYEE
+        
+        .fullScreenCover(isPresented: $showCreateEmployee) {
+            
+            CreateEmployeeView(
+                restaurantId: restaurantId
+            )
+        }
+        
+        // INVITE ALERT
+        
         .alert(
             "Код приглашения",
             isPresented: $showInviteAlert
@@ -310,11 +281,50 @@ struct EmployeesView: View {
             
             Text(inviteCode)
         }
+        
+        // TOOLBAR
+        
+        .toolbar {
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                
+                Button {
+                    
+                    inviteService.createInvite(
+                        restaurantId: restaurantId
+                    ) { result in
+                        
+                        switch result {
+                            
+                        case .success(let code):
+                            
+                            DispatchQueue.main.async {
+                                
+                                inviteCode = code
+                                showInviteAlert = true
+                            }
+                            
+                        case .failure(let error):
+                            
+                            print(error.localizedDescription)
+                        }
+                    }
+                    
+                } label: {
+                    
+                    Image(systemName: "link.badge.plus")
+                        .foregroundColor(.orange)
+                }
+            }
+        }
+        
         .onAppear {
             
             loadEmployees()
         }
     }
+    
+    // MARK: - LOAD
     
     func loadEmployees() {
         

@@ -22,13 +22,34 @@ struct EmployeeCalendarView: View {
                 .bold()
             
             // 📆 ВЫБОР МЕСЯЦА
-            Picker("Месяц", selection: $selectedMonth) {
+            Menu {
+
                 ForEach(1...12, id: \.self) { month in
-                    Text(monthName(month)).tag(month)
+
+                    Button(monthName(month)) {
+
+                        selectedMonth = month
+                    }
                 }
+
+            } label: {
+
+                HStack {
+
+                    Text(monthName(selectedMonth))
+
+                    Image(systemName: "chevron.down")
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    Color.orange.opacity(0.2)
+                )
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 14)
+                )
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
             
             // 📄 КНОПКА PDF
             Button("Выгрузить PDF") {

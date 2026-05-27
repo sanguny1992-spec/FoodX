@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseFirestore
+import FirebaseAuth
 
 struct CreateEmployeeView: View {
     
@@ -114,30 +115,55 @@ struct CreateEmployeeView: View {
         
         loading = true
         
-        let data: [String: Any] = [
-            "name": name,
-            "email": email,
-            "role": role,
-            "status": "approved",
-            "createdAt": Timestamp()
-        ]
-        
-        db.collection("restaurants")
-            .document(restaurantId)
-            .collection("employees")
-            .addDocument(data: data) { error in
+        Auth.auth().createUser(
+            withEmail: email,
+            password: password
+        ) { result, error in
+            
+            if let error {
+                
+                print(error.localizedDescription)
+                loading = false
+                return
+            }
+            
+            guard let uid = result?.user.uid else {
                 
                 loading = false
-                
-                if error == nil {
+                return
+            }
+            
+            let data: [String: Any] = [
+                "id": uid,
+                "name": name,
+                "email": email,
+                "restaurantId": restaurantId,
+                "role": role,
+                "status": "approved",
+                "createdAt": Timestamp()
+            ]
+            
+            db.collection("restaurants")
+                .document(restaurantId)
+                .collection("employees")
+                .document(uid)
+                .setData(data) { error in
+                    
+                    loading = false
+                    
+                    if let error {
+                        
+                        print(error.localizedDescription)
+                        return
+                    }
                     
                     dismiss()
                 }
-            }
+        }
     }
-    
     // MARK: - UI
-    
+
+    @ViewBuilder
     func glassField(
         _ placeholder: String,
         text: Binding<String>
