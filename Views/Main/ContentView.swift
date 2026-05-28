@@ -33,8 +33,6 @@ struct ContentView: View {
             
             ZStack {
                 
-                // BACKGROUND
-                
                 Image("FoodX")
                     .resizable()
                     .scaledToFill()
@@ -46,8 +44,6 @@ struct ContentView: View {
                 ScrollView(showsIndicators: false) {
                     
                     VStack(spacing: 18) {
-                        
-                        // TOP PANEL
                         
                         VStack(spacing: 14) {
                             
@@ -67,7 +63,7 @@ struct ContentView: View {
                                 
                                 Spacer()
                                 
-                                // 🚚 ПОСТАВЩИКИ
+                                // ПОСТАВЩИКИ
                                 
                                 NavigationLink {
                                     
@@ -80,7 +76,7 @@ struct ContentView: View {
                                         .foregroundColor(.cyan)
                                 }
                                 
-                                // 🛒 ЗАКАЗЫ
+                                // ЗАКАЗЫ
                                 
                                 NavigationLink {
                                     
@@ -95,7 +91,7 @@ struct ContentView: View {
                                         .foregroundColor(.green)
                                 }
                                 
-                                // 📜 ИСТОРИЯ
+                                // ИСТОРИЯ
                                 
                                 NavigationLink {
                                     
@@ -110,7 +106,7 @@ struct ContentView: View {
                                         .foregroundColor(.yellow)
                                 }
                                 
-                                // 🍳 МЕНЮ
+                                // МЕНЮ
                                 
                                 Button {
                                     
@@ -123,7 +119,7 @@ struct ContentView: View {
                                         .foregroundColor(.orange)
                                 }
                                 
-                                // 📅 ГРАФИК
+                                // ГРАФИК
                                 
                                 Button {
                                     
@@ -136,7 +132,22 @@ struct ContentView: View {
                                         .foregroundColor(.blue)
                                 }
                                 
-                                // ☁️ WEB SYNC
+                                // ЧАТ
+                                
+                                NavigationLink {
+                                    
+                                    ChatView(
+                                        restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+                                    )
+                                    
+                                } label: {
+                                    
+                                    Image(systemName: "message.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.green)
+                                }
+                                
+                                // WEB SYNC
                                 
                                 Button {
                                     
@@ -150,15 +161,11 @@ struct ContentView: View {
                                 }
                             }
                             
-                            // НАЗВАНИЕ
-                            
                             glassField(
                                 "Название",
                                 text: $name
                             )
                             .focused($focusedField, equals: .name)
-                            
-                            // ГРАММЫ
                             
                             glassField(
                                 "Граммы",
@@ -166,8 +173,6 @@ struct ContentView: View {
                             )
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: .qty)
-                            
-                            // ЦЕНА
                             
                             if type == .stock {
                                 
@@ -179,8 +184,6 @@ struct ContentView: View {
                                 .focused($focusedField, equals: .price)
                             }
                             
-                            // PICKER
-                            
                             Picker("", selection: $type) {
                                 
                                 ForEach(AddTarget.allCases, id: \.self) { item in
@@ -190,8 +193,6 @@ struct ContentView: View {
                             }
                             .pickerStyle(.segmented)
                             .tint(.orange)
-                            
-                            // ДОБАВИТЬ
                             
                             Button {
                                 
@@ -224,8 +225,6 @@ struct ContentView: View {
                         .padding(.horizontal)
                         .padding(.top, 90)
                         
-                        // ПОИСК
-                        
                         TextField("Поиск...", text: $searchText)
                             .padding(14)
                             .background(
@@ -236,8 +235,6 @@ struct ContentView: View {
                             )
                             .foregroundColor(.white)
                             .padding(.horizontal)
-                        
-                        // СПИСОК
                         
                         VStack(spacing: 12) {
                             
@@ -276,13 +273,9 @@ struct ContentView: View {
                 focusedField = nil
             }
             
-            // TOOLBAR
-            
             .toolbar {
                 
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    
-                    // ВЫХОД
                     
                     Button {
                         
@@ -293,8 +286,6 @@ struct ContentView: View {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
                             .foregroundColor(.red)
                     }
-                    
-                    // СОТРУДНИКИ
                     
                     NavigationLink {
                         
@@ -310,22 +301,16 @@ struct ContentView: View {
                 }
             }
             
-            // MENU
-            
             .sheet(isPresented: $showMenu) {
                 
                 DishMenuView(store: store)
                     .presentationDetents([.large])
             }
             
-            // SCHEDULE
-            
             .sheet(isPresented: $showSchedule) {
                 
                 WorkScheduleView()
             }
-            
-            // ALERT
             
             .alert(
                 "FoodX WEB",
@@ -341,8 +326,6 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - WEB SYNC
-    
     func syncWeb() {
         
         FirebaseSyncService.shared.uploadMenu(
@@ -356,8 +339,6 @@ struct ContentView: View {
         syncMessage = "WEB версия обновлена 🚀"
         showSyncAlert = true
     }
-    
-    // MARK: - ADD
     
     func add() {
         
@@ -410,8 +391,6 @@ struct ContentView: View {
         hideKeyboard()
     }
     
-    // MARK: - FILTER
-    
     var filteredSemiProducts: [SemiFinishedProduct] {
         
         searchText.isEmpty
@@ -422,8 +401,6 @@ struct ContentView: View {
             )
         }
     }
-    
-    // MARK: - UI
     
     func glassField(
         _ placeholder: String,
@@ -440,5 +417,4 @@ struct ContentView: View {
             )
             .foregroundColor(.white)
     }
-    
 }

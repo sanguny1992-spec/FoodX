@@ -383,6 +383,97 @@ h1{
     font-size:22px;
 }
 
+/* CHAT */
+
+.chatMessages{
+
+    padding-bottom:120px;
+}
+
+.chatBubble{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border-radius:22px;
+
+    padding:18px;
+
+    margin-bottom:14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(12px);
+}
+
+.chatSender{
+
+    color:#ff9500;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+}
+
+.chatInputWrap{
+
+    position:fixed;
+
+    bottom:20px;
+
+    left:20px;
+
+    right:20px;
+
+    display:flex;
+
+    gap:12px;
+
+    backdrop-filter:blur(20px);
+
+    background:
+        rgba(15,15,15,0.72);
+
+    padding:14px;
+
+    border-radius:26px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.05);
+}
+
+.chatInputWrap input{
+
+    margin:0;
+}
+
+.chatInputWrap button{
+
+    min-width:70px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9500,
+            #ff5e3a
+        );
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+    font-weight:700;
+}
+
 </style>
 
 <script type="module">
@@ -393,7 +484,12 @@ from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import {
     getFirestore,
     doc,
-    onSnapshot
+    collection,
+    addDoc,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
@@ -433,32 +529,34 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
-const db =
-    getFirestore(app);
+    const db =
+        getFirestore(app);
 
-const auth =
-    getAuth(app);
+    const auth =
+        getAuth(app);
 
-await setPersistence(
-    auth,
-    browserLocalPersistence
-);
+    let currentEmployeeName = "WEB";
 
-const restaurantId =
-    "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
+    await setPersistence(
+        auth,
+        browserLocalPersistence
+    );
+
+    const restaurantId =
+        "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
 
 // UNSUBSCRIBE
 
 let menuUnsubscribe = null;
 let semiUnsubscribe = null;
 let scheduleUnsubscribe = null;
+let chatUnsubscribe = null;
 
 // TOPBAR
 
 function renderTopbar(){
 
     return `
-
         <div class="topbar">
 
             <button onclick="loadMenu()">
@@ -473,8 +571,12 @@ function renderTopbar(){
                 График
             </button>
 
+            <button onclick="loadChat()">
+                Чат
+            </button>
+
             <button onclick="logout()">
-                Выход
+                Выйти
             </button>
 
         </div>
@@ -581,6 +683,12 @@ onAuthStateChanged(auth, async (user) => {
                 }
 
                 const employee = snap.data();
+
+                currentEmployeeName =
+                    employee.fullName ||
+                    employee.name ||
+                    employee.employeeName ||
+                    "WEB";
 
                 if(employee.status !== "approved"){
 
@@ -997,4 +1105,129 @@ window.loadSchedule = function(){
     });
 };
 
+// CHAT
+
+window.loadChat = function(){
+
+    if(chatUnsubscribe)
+        chatUnsubscribe();
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <h1>Чат</h1>
+
+        <div
+            id="messages"
+            class="chatMessages"
+        ></div>
+
+        <div class="chatInputWrap">
+
+            <input
+                id="chatInput"
+                class="search"
+                placeholder="Сообщение..."
+            >
+
+            <button id="sendBtn">
+                ➤
+            </button>
+
+        </div>
+    `;
+
+    const messages =
+        document.getElementById("messages");
+
+    const input =
+        document.getElementById("chatInput");
+
+    const sendBtn =
+        document.getElementById("sendBtn");
+
+    const q = query(
+        collection(
+            db,
+            "restaurants",
+            restaurantId,
+            "chat"
+        ),
+        orderBy("createdAt")
+    );
+
+    chatUnsubscribe =
+        onSnapshot(q,snapshot => {
+
+        messages.innerHTML = "";
+
+        snapshot.forEach(docSnap => {
+
+            const msg =
+                docSnap.data();
+
+            messages.innerHTML += `
+
+                <div class="chatBubble">
+
+                    <div class="chatSender">
+
+                        ${msg.sender || "WEB"}
+
+                    </div>
+
+                    <div>
+
+                        ${msg.text || ""}
+
+                    </div>
+
+                </div>
+            `;
+        });
+
+        window.scrollTo(
+            0,
+            document.body.scrollHeight
+        );
+    });
+
+    sendBtn.onclick = async () => {
+
+        const text =
+            input.value.trim();
+
+        if(!text) return;
+
+        await addDoc(
+            collection(
+                db,
+                "restaurants",
+                restaurantId,
+                "chat"
+            ),
+            {
+                sender: currentEmployeeName,
+                text: text,
+                createdAt: serverTimestamp()
+            }
+        );
+
+        input.value = "";
+    };
+};
+
 </script>
+
+</head>
+
+<body>
+
+<div class="loading">
+    Загрузка...
+</div>
+
+</body>
+
+</html>
