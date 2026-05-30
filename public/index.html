@@ -1,14 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
 
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>FoodX WEB</title>
 
@@ -25,6 +21,7 @@ body{
     background:
         radial-gradient(circle at top left,#ff7b0015,transparent 30%),
         radial-gradient(circle at top right,#ff2d5512,transparent 25%),
+        radial-gradient(circle at bottom,#ffffff08,transparent 40%),
         #0b0b0c;
 
     color:white;
@@ -37,24 +34,133 @@ body{
     padding:20px;
 
     min-height:100vh;
+    /* IOS CALENDAR */
+
+    .monthCard{
+
+        margin-top:24px;
+
+        padding:20px;
+
+        border-radius:26px;
+
+        background:
+            rgba(255,255,255,0.03);
+
+        border:
+            1px solid rgba(255,255,255,0.04);
+    }
+
+    .monthTitle{
+
+        font-size:20px;
+
+        font-weight:800;
+
+        margin-bottom:18px;
+
+        color:#ff9500;
+    }
+
+    .weekDays{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(7,1fr);
+
+        margin-bottom:10px;
+
+        opacity:0.5;
+
+        text-align:center;
+
+        font-size:13px;
+    }
+
+    .iosMonthGrid{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(7,1fr);
+
+        gap:10px;
+    }
+
+    .iosCalendarDay{
+
+        aspect-ratio:1;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:18px;
+
+        background:
+            rgba(255,255,255,0.04);
+
+        font-weight:700;
+
+        transition:0.2s;
+
+        font-size:15px;
+    }
+
+    .activeCalendarDay{
+
+        background:
+            linear-gradient(
+                135deg,
+                #22c55e,
+                #16a34a
+            );
+
+        box-shadow:
+            0 8px 18px
+            rgba(34,197,94,0.35);
+    }
+
+    .activeCalendarDay:hover{
+
+        transform:scale(1.06);
+    }
+
+    @media (max-width:768px){
+
+        .iosMonthGrid{
+
+            gap:6px;
+        }
+
+        .iosCalendarDay{
+
+            border-radius:12px;
+
+            font-size:13px;
+        }
+
+        .weekDays{
+
+            font-size:11px;
+        }
+    }
 }
 
-h1{
-
-    margin-bottom:24px;
-
-    font-size:36px;
-
-    font-weight:800;
-}
+/* TOPBAR */
 
 .topbar{
 
     display:flex;
+    
+    flex-wrap:wrap;
 
     gap:12px;
 
-    margin-bottom:26px;
+    margin-bottom:28px;
 
     position:sticky;
 
@@ -62,24 +168,33 @@ h1{
 
     z-index:999;
 
-    backdrop-filter:blur(18px);
+    backdrop-filter:blur(24px);
 
-    background:rgba(15,15,15,0.65);
+    background:
+        rgba(15,15,15,0.72);
 
     padding:14px;
 
-    border-radius:24px;
+    border-radius:26px;
 
-    border:1px solid rgba(255,255,255,0.05);
+    border:
+        1px solid
+        rgba(255,255,255,0.06);
+
+    box-shadow:
+        0 10px 40px
+        rgba(0,0,0,0.35);
+
+    overflow:auto;
 }
 
 .topbar button{
 
     flex:1;
-
-    padding:16px;
-
+    
     border:none;
+
+    padding:16px 22px;
 
     border-radius:18px;
 
@@ -92,23 +207,56 @@ h1{
 
     color:white;
 
+    font-size:15px;
+
     font-weight:700;
 
     cursor:pointer;
 
-    font-size:15px;
-
-    transition:0.25s;
-
-    box-shadow:
-        0 8px 24px
-        rgba(255,149,0,0.25);
+    white-space:nowrap;
 }
 
-.topbar button:hover{
+/* TITLES */
 
-    transform:translateY(-2px);
+h1{
+
+    font-size:38px;
+
+    margin-bottom:24px;
+
+    font-weight:800;
 }
+
+/* SEARCH */
+
+.search{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:22px;
+
+    margin-bottom:24px;
+
+    background:
+        rgba(255,255,255,0.05);
+
+    color:white;
+
+    font-size:16px;
+
+    backdrop-filter:blur(18px);
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+}
+
+/* CARD */
 
 .card{
 
@@ -125,7 +273,7 @@ h1{
         1px solid
         rgba(255,255,255,0.06);
 
-    backdrop-filter:blur(22px);
+    backdrop-filter:blur(24px);
 
     box-shadow:
 
@@ -140,42 +288,47 @@ h1{
 
 .card:hover{
 
-    transform:translateY(-3px);
+    transform:translateY(-4px);
+
+    box-shadow:
+
+        0 18px 50px
+        rgba(0,0,0,0.45);
 }
 
 .title{
 
-    font-size:26px;
+    font-size:28px;
 
     font-weight:800;
 }
 
 .category{
 
-    color:#ff9500;
-
     margin-top:8px;
+
+    color:#ff9500;
 
     font-weight:600;
 }
 
 .grams{
 
-    margin-top:14px;
+    margin-top:12px;
 
     opacity:0.7;
 }
 
 .section{
 
-    margin-top:22px;
+    margin-top:24px;
 }
 
 .section h3{
 
-    margin-bottom:12px;
-
     color:#ff9500;
+
+    margin-bottom:14px;
 }
 
 .ingredient{
@@ -183,13 +336,11 @@ h1{
     background:
         rgba(255,255,255,0.05);
 
-    border-radius:16px;
-
     padding:14px;
 
-    margin-bottom:10px;
+    border-radius:16px;
 
-    backdrop-filter:blur(12px);
+    margin-bottom:10px;
 }
 
 .instruction{
@@ -199,114 +350,7 @@ h1{
     opacity:0.92;
 }
 
-.search{
-
-    width:100%;
-
-    padding:18px;
-
-    border:none;
-
-    border-radius:22px;
-
-    background:
-        rgba(255,255,255,0.05);
-
-    color:white;
-
-    margin-bottom:24px;
-
-    font-size:16px;
-
-    backdrop-filter:blur(16px);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.05);
-
-    outline:none;
-}
-
-.select{
-
-    width:100%;
-
-    padding:18px;
-
-    border:none;
-
-    border-radius:22px;
-
-    background:
-        rgba(255,255,255,0.05);
-
-    color:white;
-
-    margin-bottom:18px;
-
-    font-size:16px;
-
-    backdrop-filter:blur(16px);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.05);
-}
-
-.calendar{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(7,1fr);
-
-    gap:10px;
-
-    margin-top:24px;
-}
-
-.day{
-
-    background:
-        rgba(255,255,255,0.05);
-
-    border-radius:18px;
-
-    padding:18px;
-
-    text-align:center;
-
-    transition:0.2s;
-
-    backdrop-filter:blur(12px);
-
-    border:
-        1px solid
-        rgba(255,255,255,0.04);
-}
-
-.day:hover{
-
-    transform:scale(1.05);
-}
-
-.active{
-
-    background:
-        linear-gradient(
-            135deg,
-            #22c55e,
-            #16a34a
-        );
-
-    color:white;
-
-    font-weight:700;
-
-    box-shadow:
-        0 8px 20px
-        rgba(34,197,94,0.35);
-}
+/* LOGIN */
 
 .login{
 
@@ -316,20 +360,15 @@ h1{
 
     padding:28px;
 
+    border-radius:32px;
+
     background:
         rgba(28,28,30,0.72);
-
-    border-radius:32px;
 
     backdrop-filter:blur(22px);
 
     border:
-        1px solid
-        rgba(255,255,255,0.05);
-
-    box-shadow:
-        0 10px 40px
-        rgba(0,0,0,0.4);
+        1px solid rgba(255,255,255,0.06);
 }
 
 .login button{
@@ -351,18 +390,11 @@ h1{
 
     color:white;
 
-    font-weight:700;
-
     font-size:17px;
 
+    font-weight:700;
+
     cursor:pointer;
-
-    transition:0.25s;
-}
-
-.login button:hover{
-
-    transform:translateY(-2px);
 }
 
 .error{
@@ -372,15 +404,42 @@ h1{
     margin-top:16px;
 }
 
-.loading{
+/* CALENDAR */
+
+.calendar{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(7,1fr);
+
+    gap:10px;
+
+    margin-top:20px;
+}
+
+.day{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border-radius:18px;
+
+    padding:18px;
 
     text-align:center;
+}
 
-    margin-top:120px;
+.active{
 
-    opacity:0.5;
+    background:
+        linear-gradient(
+            135deg,
+            #22c55e,
+            #16a34a
+        );
 
-    font-size:22px;
+    font-weight:700;
 }
 
 /* CHAT */
@@ -402,10 +461,18 @@ h1{
     margin-bottom:14px;
 
     border:
-        1px solid
-        rgba(255,255,255,0.05);
+        1px solid rgba(255,255,255,0.05);
+}
 
-    backdrop-filter:blur(12px);
+.chatTop{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:10px;
 }
 
 .chatSender{
@@ -414,7 +481,32 @@ h1{
 
     font-weight:700;
 
-    margin-bottom:8px;
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.onlineDot{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+}
+
+.chatTime{
+
+    color:#bdbdbd;
+
+    font-size:13px;
+}
+
+.chatText{
+
+    line-height:1.6;
 }
 
 .chatInputWrap{
@@ -431,18 +523,17 @@ h1{
 
     gap:12px;
 
+    padding:14px;
+
+    border-radius:26px;
+
     backdrop-filter:blur(20px);
 
     background:
         rgba(15,15,15,0.72);
 
-    padding:14px;
-
-    border-radius:26px;
-
     border:
-        1px solid
-        rgba(255,255,255,0.05);
+        1px solid rgba(255,255,255,0.05);
 }
 
 .chatInputWrap input{
@@ -470,10 +561,254 @@ h1{
     font-size:20px;
 
     cursor:pointer;
-
-    font-weight:700;
 }
 
+/* LOADING */
+
+.loading{
+
+    text-align:center;
+
+    margin-top:120px;
+
+    opacity:0.6;
+
+    font-size:24px;
+}
+    .scheduleHeader{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        cursor:pointer;
+    }
+
+    .employeeName{
+
+        font-size:24px;
+
+        font-weight:800;
+    }
+
+    .employeeSub{
+
+        margin-top:6px;
+
+        color:#ff9500;
+
+        opacity:0.8;
+
+        font-size:14px;
+    }
+
+    .arrow{
+
+        font-size:28px;
+
+        transition:0.3s;
+    }
+
+    .calendarHidden{
+
+        max-height:0;
+
+        overflow:hidden;
+
+        opacity:0;
+
+        transition:
+            max-height 0.45s ease,
+            opacity 0.3s ease,
+            margin-top 0.3s ease;
+
+        margin-top:0;
+    }
+
+    .calendarHidden.opened{
+
+        max-height:2000px;
+
+        opacity:1;
+
+        margin-top:22px;
+    }
+
+    .monthBlock{
+
+        margin-bottom:24px;
+    }
+
+    .monthTitle{
+
+        font-size:18px;
+
+        font-weight:700;
+
+        margin-bottom:14px;
+
+        color:#ff9500;
+    }
+
+    .iosCalendar{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(auto-fill,minmax(52px,1fr));
+
+        gap:12px;
+    }
+
+    .iosDay{
+
+        height:52px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:18px;
+
+        font-weight:700;
+
+        font-size:15px;
+
+        backdrop-filter:blur(12px);
+
+        transition:0.2s;
+    }
+
+    .activeDay{
+
+        background:
+            linear-gradient(
+                135deg,
+                #22c55e,
+                #16a34a
+            );
+
+        box-shadow:
+            0 8px 20px
+            rgba(34,197,94,0.3);
+    }
+
+    .activeDay:hover{
+
+        transform:scale(1.05);
+    }
+    /* MOBILE */
+
+    @media (max-width: 768px){
+
+        body{
+
+            padding:12px;
+        }
+
+        h1{
+
+            font-size:28px;
+        }
+
+        .topbar{
+
+            gap:8px;
+
+            padding:10px;
+
+            border-radius:18px;
+
+            overflow-x:auto;
+        }
+
+        .topbar button{
+
+            padding:12px 16px;
+
+            font-size:13px;
+
+            border-radius:14px;
+
+            flex:none;
+        }
+
+        .card{
+
+            padding:18px;
+
+            border-radius:22px;
+        }
+
+        .title{
+
+            font-size:22px;
+        }
+
+        .search{
+
+            padding:14px;
+
+            font-size:15px;
+
+            border-radius:16px;
+        }
+
+        .chatInputWrap{
+
+            left:12px;
+
+            right:12px;
+
+            bottom:12px;
+
+            padding:10px;
+
+            border-radius:18px;
+        }
+
+        .chatInputWrap button{
+
+            min-width:58px;
+
+            border-radius:14px;
+        }
+
+        .calendar{
+
+            grid-template-columns:
+                repeat(4,1fr);
+        }
+
+        .iosCalendar{
+
+            grid-template-columns:
+                repeat(4,1fr);
+        }
+
+        .iosDay{
+
+            height:44px;
+
+            font-size:14px;
+
+            border-radius:14px;
+        }
+
+        .employeeName{
+
+            font-size:20px;
+        }
+
+        .monthTitle{
+
+            font-size:16px;
+        }
+    }
 </style>
 
 <script type="module">
@@ -489,7 +824,8 @@ import {
     query,
     orderBy,
     onSnapshot,
-    serverTimestamp
+    serverTimestamp,
+    updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
@@ -503,7 +839,7 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-// FIREBASE
+/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -529,70 +865,25 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
-    const db =
-        getFirestore(app);
+const db =
+    getFirestore(app);
 
-    const auth =
-        getAuth(app);
+const auth =
+    getAuth(app);
 
-    let currentEmployeeName = "WEB";
+await setPersistence(
+    auth,
+    browserLocalPersistence
+);
 
-    await setPersistence(
-        auth,
-        browserLocalPersistence
-    );
+const restaurantId =
+    "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
 
-    const restaurantId =
-        "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
+let currentEmployeeName = "WEB";
+let currentEmployeeId = null;
+let onlineEmployees = {};
 
-// UNSUBSCRIBE
-
-let menuUnsubscribe = null;
-let semiUnsubscribe = null;
-let scheduleUnsubscribe = null;
-let chatUnsubscribe = null;
-
-// TOPBAR
-
-function renderTopbar(){
-
-    return `
-        <div class="topbar">
-
-            <button onclick="loadMenu()">
-                Меню
-            </button>
-
-            <button onclick="loadSemi()">
-                Полуфабрикаты
-            </button>
-
-            <button onclick="loadSchedule()">
-                График
-            </button>
-
-            <button onclick="loadChat()">
-                Чат
-            </button>
-
-            <button onclick="logout()">
-                Выйти
-            </button>
-
-        </div>
-    `;
-}
-
-// LOGOUT
-
-window.logout = async function(){
-
-    await signOut(auth);
-
-    showLogin();
-};
-
-// LOGIN SCREEN
+/* LOGIN */
 
 function showLogin(){
 
@@ -632,8 +923,6 @@ function showLogin(){
         .onclick = login;
 }
 
-// LOGIN
-
 async function login(){
 
     const email =
@@ -654,17 +943,19 @@ async function login(){
 
         document
             .getElementById("error")
-            .innerText = "Ошибка входа";
+            .innerText =
+                "Ошибка входа";
     }
 }
 
-// AUTO LOGIN
+/* AUTH */
 
-onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user) => {
 
-    if(user){
+        if(user){
 
-        try{
+            currentEmployeeId =
+                user.uid;
 
             const employeeRef = doc(
                 db,
@@ -674,69 +965,97 @@ onAuthStateChanged(auth, async (user) => {
                 user.uid
             );
 
-            onSnapshot(employeeRef, snap => {
+            onSnapshot(employeeRef, async snap => {
 
                 if(!snap.exists()){
 
-                    showLogin();
+                    currentEmployeeName = "WEB";
+
+                    loadMenu();
+
                     return;
                 }
 
-                const employee = snap.data();
+                const employee =
+                    snap.data();
 
                 currentEmployeeName =
-                    employee.fullName ||
                     employee.name ||
-                    employee.employeeName ||
+                    employee.fullName ||
+                    employee.email ||
                     "WEB";
 
-                if(employee.status !== "approved"){
+                try{
 
-                    showLogin();
-                    return;
-                }
+                    await updateDoc(employeeRef,{
+                        isOnline:true
+                    });
+
+                }catch(e){}
 
                 loadMenu();
             });
 
-        }catch(error){
-
-            console.log(error);
+        }else{
 
             showLogin();
         }
+    });
 
-    }else{
+/* LOGOUT */
 
-        showLogin();
-    }
-});
+window.logout = async function(){
 
-// MENU
+    await signOut(auth);
+
+    showLogin();
+};
+
+/* TOPBAR */
+
+function renderTopbar(){
+
+    return `
+        <div class="topbar">
+
+            <button onclick="loadMenu()">
+                Меню
+            </button>
+
+            <button onclick="loadSemi()">
+                Полуфабрикаты
+            </button>
+
+            <button onclick="loadSchedule()">
+                График
+            </button>
+
+            <button onclick="loadChat()">
+                Чат
+            </button>
+
+            <button onclick="logout()">
+                Выйти
+            </button>
+
+        </div>
+    `;
+}
+
+/* MENU */
 
 window.loadMenu = function(){
-
-    if(menuUnsubscribe)
-        menuUnsubscribe();
 
     const ref =
         doc(db,"menus","main");
 
-    menuUnsubscribe = onSnapshot(ref,snap => {
+    onSnapshot(ref,snap => {
 
-        if(!snap.exists()){
+        const data =
+            snap.data();
 
-            document.body.innerHTML =
-                `<div class="loading">
-                    Меню пустое
-                </div>`;
-
-            return;
-        }
-
-        const data = snap.data();
-
-        const dishes = data.dishes || [];
+        const dishes =
+            data?.dishes || [];
 
         document.body.innerHTML = `
 
@@ -756,33 +1075,30 @@ window.loadMenu = function(){
         const content =
             document.getElementById("content");
 
-        const search =
-            document.getElementById("search");
-
-        function render(filter = ""){
+        function render(filter=""){
 
             content.innerHTML = "";
 
             dishes
                 .filter(d =>
-                    d.name.toLowerCase()
-                    .includes(filter.toLowerCase())
+                    d.name
+                    ?.toLowerCase()
+                    .includes(
+                        filter.toLowerCase()
+                    )
                 )
                 .forEach(dish => {
 
                 let ingredientsHTML = "";
 
                 (dish.ingredients || [])
-                    .forEach(i => {
+                .forEach(i => {
 
                     ingredientsHTML += `
-
                         <div class="ingredient">
-
-                            ${i.name}
+                            ${i.name || ""}
                             —
-                            ${i.grams} г
-
+                            ${i.grams || 0} г
                         </div>
                     `;
                 });
@@ -792,11 +1108,11 @@ window.loadMenu = function(){
                     <div class="card">
 
                         <div class="title">
-                            ${dish.name}
+                            ${dish.name || ""}
                         </div>
 
                         <div class="category">
-                            ${dish.category || "Без категории"}
+                            ${dish.category || ""}
                         </div>
 
                         <div class="grams">
@@ -817,7 +1133,7 @@ window.loadMenu = function(){
 
                             <div class="instruction">
 
-                                ${dish.instruction || "Нет описания"}
+                                ${dish.instruction || ""}
 
                             </div>
 
@@ -830,82 +1146,73 @@ window.loadMenu = function(){
 
         render();
 
-        search.oninput = e => {
+        document
+            .getElementById("search")
+            .oninput = e => {
 
             render(e.target.value);
         };
     });
 };
 
-// SEMI
+/* SEMI */
 
-window.loadSemi = function(){
+   
 
-    if(semiUnsubscribe)
-        semiUnsubscribe();
+    window.loadSemi = function(){
 
-    const ref =
-        doc(db,"semi","main");
+        const semiRef =
+            collection(db,"semi");
 
-    semiUnsubscribe = onSnapshot(ref,snap => {
+        onSnapshot(semiRef,(snapshot)=>{
 
-        if(!snap.exists()){
+            let semiProducts = [];
 
-            document.body.innerHTML =
-                `<div class="loading">
-                    Нет полуфабрикатов
-                </div>`;
+            snapshot.forEach(docSnap=>{
 
-            return;
-        }
+                const data = docSnap.data();
 
-        const data = snap.data();
+                if(data.semiProducts){
 
-        const semiProducts =
-            data.semiProducts || [];
+                    semiProducts.push(...data.semiProducts);
+                }
+            });
 
-        document.body.innerHTML = `
+            document.body.innerHTML = `
 
-            ${renderTopbar()}
+                ${renderTopbar()}
 
-            <h1>Полуфабрикаты</h1>
+                <h1>Полуфабрикаты</h1>
 
-            <input
-                id="search"
-                class="search"
-                placeholder="Поиск"
-            >
+                <div id="content"></div>
+            `;
 
-            <div id="content"></div>
-        `;
+            const content =
+                document.getElementById("content");
 
-        const content =
-            document.getElementById("content");
+            if(semiProducts.length === 0){
 
-        function render(filter = ""){
+                content.innerHTML = `
+                    <div class="card">
+                        Полуфабрикаты не найдены
+                    </div>
+                `;
 
-            content.innerHTML = "";
+                return;
+            }
 
-            semiProducts
-                .filter(s =>
-                    s.name.toLowerCase()
-                    .includes(filter.toLowerCase())
-                )
-                .forEach(semi => {
+            semiProducts.forEach(semi=>{
 
                 let ingredientsHTML = "";
 
                 (semi.ingredients || [])
-                    .forEach(i => {
+                .forEach(i=>{
 
                     ingredientsHTML += `
-
                         <div class="ingredient">
-
-                            ${i.name}
+                            ${i.name || ""}
                             —
-                            ${i.grams} г
-
+                            ${i.grams || 0} г
                         </div>
                     `;
                 });
@@ -915,7 +1222,7 @@ window.loadSemi = function(){
                     <div class="card">
 
                         <div class="title">
-                            ${semi.name}
+                            ${semi.name || "Без названия"}
                         </div>
 
                         <div class="grams">
@@ -946,177 +1253,216 @@ window.loadSemi = function(){
                     </div>
                 `;
             });
-        }
-
-        render();
-
-        document
-            .getElementById("search")
-            .oninput = e => {
-
-            render(e.target.value);
-        };
-    });
-};
-
-// SCHEDULE
-
-window.loadSchedule = function(){
-
-    if(scheduleUnsubscribe)
-        scheduleUnsubscribe();
-
-    const ref =
-        doc(db,"schedules","main");
-
-    scheduleUnsubscribe = onSnapshot(ref,snap => {
-
-        if(!snap.exists()){
-
-            document.body.innerHTML =
-                `<div class="loading">
-                    Нет графика
-                </div>`;
-
-            return;
-        }
-
-        const data = snap.data();
-
-        const employees =
-            data.employees || [];
-
-        document.body.innerHTML = `
-
-            ${renderTopbar()}
-
-            <h1>График</h1>
-
-            <select
-                id="employee"
-                class="select"
-            ></select>
-
-            <select
-                id="month"
-                class="select"
-            ></select>
-
-            <div id="calendar"></div>
-        `;
-
-        const employeeSelect =
-            document.getElementById("employee");
-
-        const monthSelect =
-            document.getElementById("month");
-
-        const calendar =
-            document.getElementById("calendar");
-
-        employees.forEach((emp,index) => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = index;
-
-            option.textContent = emp.name;
-
-            employeeSelect.appendChild(option);
         });
+    };
 
-        let currentEmployee =
-            employees[0];
+   
+/* SCHEDULE */
 
-        function renderMonths(){
+    
 
-            monthSelect.innerHTML = "";
+    
+    window.loadSchedule = function(){
 
-            const months =
-                Object.keys(
-                    currentEmployee.monthDays || {}
-                );
+        const schedulesRef =
+            collection(db,"schedules");
 
-            months.forEach(month => {
+        onSnapshot(schedulesRef,(snapshot)=>{
 
-                const option =
-                    document.createElement("option");
+            let employees = [];
 
-                option.value = month;
+            snapshot.forEach(docSnap=>{
 
-                option.textContent = month;
+                const data = docSnap.data();
 
-                monthSelect.appendChild(option);
+                if(data.employees){
+
+                    employees.push(...data.employees);
+                }
             });
 
-            renderCalendar();
-        }
+            document.body.innerHTML = `
 
-        function renderCalendar(){
+                ${renderTopbar()}
 
-            const selectedMonth =
-                monthSelect.value;
+                <h1>График</h1>
 
-            const activeDays =
-                currentEmployee
-                .monthDays?.[selectedMonth] || [];
+                <div id="scheduleWrap"></div>
+            `;
 
-            let html =
-                `<div class="calendar">`;
+            const wrap =
+                document.getElementById("scheduleWrap");
 
-            for(let i=1;i<=31;i++){
+            if(employees.length === 0){
 
-                html += `
+                wrap.innerHTML = `
+                    <div class="card">
+                        График пуст
+                    </div>
+                `;
 
-                    <div class="
-                        day
-                        ${activeDays.includes(i)
-                            ? "active"
-                            : ""
-                        }
-                    ">
+                return;
+            }
 
-                        ${i}
+            employees.forEach((emp,index)=>{
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "card";
+
+                let monthsHTML = "";
+
+                const monthDays =
+                    emp.monthDays || {};
+
+                Object.keys(monthDays)
+                .forEach(month=>{
+
+                    const activeDays =
+                        monthDays[month] || [];
+
+                    const daysInMonth = 31;
+
+                    let calendarHTML = "";
+
+                    for(let day = 1; day <= daysInMonth; day++){
+
+                        const active =
+                            activeDays.includes(day);
+
+                        calendarHTML += `
+
+                            <div class="
+                                iosCalendarDay
+                                ${active ? "activeCalendarDay" : ""}
+                            ">
+
+                                ${day}
+
+                            </div>
+                        `;
+                    }
+
+                    monthsHTML += `
+
+                        <div class="monthCard">
+
+                            <div class="monthTitle">
+
+                                ${month}
+
+                            </div>
+
+                            <div class="weekDays">
+
+                                <div>Пн</div>
+                                <div>Вт</div>
+                                <div>Ср</div>
+                                <div>Чт</div>
+                                <div>Пт</div>
+                                <div>Сб</div>
+                                <div>Вс</div>
+
+                            </div>
+
+                            <div class="iosMonthGrid">
+
+                                ${calendarHTML}
+
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+
+                    <div
+                        class="scheduleHeader"
+                        onclick="toggleSchedule(${index})"
+                    >
+
+                        <div>
+
+                            <div class="employeeName">
+
+                                ${emp.name || "Сотрудник"}
+
+                            </div>
+
+                            <div class="employeeSub">
+
+                                Нажми чтобы открыть календарь
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="arrow-${index}"
+                            class="arrow"
+                        >
+                            ⌄
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="calendar-${index}"
+                        class="calendarHidden"
+                    >
+
+                        ${monthsHTML}
 
                     </div>
                 `;
-            }
 
-            html += `</div>`;
+                wrap.appendChild(card);
+            });
 
-            calendar.innerHTML = html;
-        }
+            window.toggleSchedule = function(index){
 
-        employeeSelect.onchange = () => {
+                const calendar =
+                    document.getElementById(
+                        `calendar-${index}`
+                    );
 
-            currentEmployee =
-                employees[
-                    employeeSelect.value
-                ];
+                const arrow =
+                    document.getElementById(
+                        `arrow-${index}`
+                    );
 
-            renderMonths();
-        };
+                if(calendar.classList.contains("opened")){
 
-        monthSelect.onchange =
-            renderCalendar;
+                    calendar.classList.remove("opened");
 
-        renderMonths();
-    });
-};
+                    arrow.style.transform =
+                        "rotate(0deg)";
 
-// CHAT
+                }else{
+
+                    calendar.classList.add("opened");
+
+                    arrow.style.transform =
+                        "rotate(180deg)";
+                }
+            };
+        });
+    };
+
+
+    
+
+/* CHAT */
 
 window.loadChat = function(){
-
-    if(chatUnsubscribe)
-        chatUnsubscribe();
 
     document.body.innerHTML = `
 
         ${renderTopbar()}
 
-        <h1>Чат</h1>
+        <h1>Командный чат</h1>
 
         <div
             id="messages"
@@ -1147,6 +1493,32 @@ window.loadChat = function(){
     const sendBtn =
         document.getElementById("sendBtn");
 
+    const employeesRef = collection(
+        db,
+        "restaurants",
+        restaurantId,
+        "employees"
+    );
+
+    onSnapshot(employeesRef, snapshot => {
+
+        onlineEmployees = {};
+
+        snapshot.forEach(docSnap => {
+
+            const employee =
+                docSnap.data();
+
+            const name =
+                employee.name ||
+                employee.fullName ||
+                employee.email;
+
+            onlineEmployees[name] =
+                employee.isOnline || false;
+        });
+    });
+
     const q = query(
         collection(
             db,
@@ -1157,8 +1529,7 @@ window.loadChat = function(){
         orderBy("createdAt")
     );
 
-    chatUnsubscribe =
-        onSnapshot(q,snapshot => {
+    onSnapshot(q, snapshot => {
 
         messages.innerHTML = "";
 
@@ -1167,17 +1538,59 @@ window.loadChat = function(){
             const msg =
                 docSnap.data();
 
+            const isOnline =
+                onlineEmployees[msg.sender];
+
+            let time = "";
+
+            if(msg.createdAt){
+
+                const date =
+                    msg.createdAt.toDate();
+
+                time =
+                    date.toLocaleTimeString(
+                        "ru-RU",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    );
+            }
+
             messages.innerHTML += `
 
                 <div class="chatBubble">
 
-                    <div class="chatSender">
+                    <div class="chatTop">
 
-                        ${msg.sender || "WEB"}
+                        <div class="chatSender">
+
+                            <div
+                                class="onlineDot"
+                                style="
+                                    background:
+                                    ${
+                                        isOnline
+                                        ? '#22c55e'
+                                        : '#666'
+                                    };
+                                "
+                            ></div>
+
+                            ${msg.sender || "WEB"}
+
+                        </div>
+
+                        <div class="chatTime">
+
+                            ${time}
+
+                        </div>
 
                     </div>
 
-                    <div>
+                    <div class="chatText">
 
                         ${msg.text || ""}
 
@@ -1229,5 +1642,5 @@ window.loadChat = function(){
 </div>
 
 </body>
-
 </html>
+

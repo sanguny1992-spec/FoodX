@@ -55,7 +55,7 @@ struct ContentView: View {
                                         .font(.caption2)
                                         .foregroundColor(.white.opacity(0.35))
                                     
-                                    Text("By Zabredun")
+                                    Text("By Vakulenko")
                                         .font(.caption)
                                         .foregroundColor(.white.opacity(0.35))
                                         .italic()
@@ -269,7 +269,7 @@ struct ContentView: View {
             
             .onTapGesture {
                 
-                hideKeyboard()
+                
                 focusedField = nil
             }
             

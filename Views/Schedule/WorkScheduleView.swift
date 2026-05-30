@@ -82,39 +82,48 @@ struct WorkScheduleView: View {
                 List {
                     
                     ForEach($employees) { $emp in
-                        
+
                         NavigationLink {
-                            
+
                             EmployeeCalendarView(
                                 employee: $emp
                             ) {
-                                
-                                // LOCAL SAVE
-                                
+
                                 storage.save(employees)
-                                
-                                // FIREBASE REALTIME
-                                
+
                                 ScheduleShareService()
                                     .uploadSchedule(
                                         employees: employees
                                     ) { _ in }
                             }
-                            
+
                         } label: {
-                            
+
                             VStack(
                                 alignment: .leading
                             ) {
-                                
+
                                 Text(emp.name)
                                     .font(.headline)
-                                
+
                                 Text("Открыть календарь")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
                         }
+                    }
+                    .onDelete { indexSet in
+
+                        employees.remove(atOffsets: indexSet)
+
+                        // сохранить локально
+                        storage.save(employees)
+
+                        // обновить Firebase
+                        ScheduleShareService()
+                            .uploadSchedule(
+                                employees: employees
+                            ) { _ in }
                     }
                 }
             }
