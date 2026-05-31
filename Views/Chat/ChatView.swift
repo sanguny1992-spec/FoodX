@@ -11,7 +11,61 @@ struct ChatView: View {
         ChatService()
 
     @State private var text = ""
+    @EnvironmentObject var store: InventoryStore
+    
+    func isWriteOffRequest(_ text: String) -> Bool {
 
+        let lower = text.lowercased()
+
+        return lower.contains("списать")
+            || lower.contains("спишите")
+            || lower.contains("списание")
+    }
+    func processWriteOff(_ text: String) {
+
+        let lower = text.lowercased()
+
+        let words = lower.components(separatedBy: " ")
+
+        guard let amountWord = words.first(where: {
+            Double($0) != nil
+        }) else {
+            return
+        }
+
+        guard let amount = Double(amountWord) else {
+            return
+        }
+
+        var productName = lower
+
+        productName = productName
+            .replacingOccurrences(of: "списать", with: "")
+            .replacingOccurrences(of: "спишите", with: "")
+            .replacingOccurrences(of: amountWord, with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let index = store.products.firstIndex(where: {
+
+            $0.name.lowercased().contains(productName)
+
+        }) else {
+
+            print("Продукт не найден: \(productName)")
+            return
+        }
+
+        store.products[index].quantityInGrams -= amount
+
+        if store.products[index].quantityInGrams < 0 {
+
+            store.products[index].quantityInGrams = 0
+        }
+
+        store.save()
+
+        print("Списано \(amount) г из \(store.products[index].name)")
+    }
     var body: some View {
 
         VStack {
@@ -25,7 +79,7 @@ struct ChatView: View {
                     ForEach(service.messages) { msg in
 
                         let isMe =
-                            msg.senderId == auth.userId
+                            msg.senderId ?? "" == auth.userId
 
                         VStack(
                             alignment: isMe
@@ -56,6 +110,33 @@ struct ChatView: View {
 
                             Text(msg.text)
                                 .foregroundColor(.white)
+                            if isWriteOffRequest(msg.text) {
+
+                                Button {
+
+                                    processWriteOff(msg.text)
+
+                                } label: {
+
+                                    HStack {
+
+                                        Image(systemName: "shippingbox.fill")
+
+                                        Text("Запрос на списание")
+                                    }
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 8)
+                                    .background(.orange)
+                                    .foregroundColor(.white)
+                                    .clipShape(
+                                        RoundedRectangle(
+                                            cornerRadius: 10
+                                        )
+                                    )
+                                }
+                                .padding(.top, 4)
+                            }
                         }
                         .padding()
                         .background(

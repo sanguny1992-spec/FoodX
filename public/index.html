@@ -1607,30 +1607,31 @@ window.loadChat = function(){
     });
 
     sendBtn.onclick = async () => {
-
+        
         const text =
-            input.value.trim();
-
+        input.value.trim();
+        
         if(!text) return;
-
+        
         await addDoc(
-            collection(
-                db,
-                "restaurants",
-                restaurantId,
-                "chat"
-            ),
-            {
-                sender: currentEmployeeName,
-                text: text,
-                createdAt: serverTimestamp()
-            }
-        );
+                     collection(
+                                db,
+                                "restaurants",
+                                restaurantId,
+                                "chat"
+                                ),
+                     {
+                         sender: currentEmployeeName,
+                         senderId: currentEmployeeId,
+                         text: text,
+                         createdAt: serverTimestamp()
+                     }
+                     );
+                     input.value = "";
+                 };
+             };
 
-        input.value = "";
-    };
-};
-
+             window.loadMenu();
 </script>
 
 </head>
@@ -1643,4 +1644,3 @@ window.loadChat = function(){
 
 </body>
 </html>
-

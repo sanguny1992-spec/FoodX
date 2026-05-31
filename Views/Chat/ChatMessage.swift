@@ -7,7 +7,7 @@ struct ChatMessage: Identifiable, Codable {
     var id: String?
 
     var sender: String
-    var senderId: String
+    var senderId: String?
     var text: String
     var createdAt: Timestamp?
 }

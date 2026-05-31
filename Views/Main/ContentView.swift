@@ -135,13 +135,14 @@ struct ContentView: View {
                                 // ЧАТ
                                 
                                 NavigationLink {
-                                    
+
                                     ChatView(
                                         restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
                                     )
-                                    
+                                    .environmentObject(store)
+
                                 } label: {
-                                    
+
                                     Image(systemName: "message.fill")
                                         .font(.title2)
                                         .foregroundColor(.green)
