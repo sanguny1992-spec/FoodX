@@ -226,39 +226,11 @@ struct ContentView: View {
                         .padding(.horizontal)
                         .padding(.top, 90)
                         
-                        TextField("Поиск...", text: $searchText)
-                            .padding(14)
-                            .background(
-                                Color.white.opacity(0.08)
-                            )
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 16)
-                            )
-                            .foregroundColor(.white)
-                            .padding(.horizontal)
-                        
-                        VStack(spacing: 12) {
-                            
-                            switch type {
-                                
-                            case .stock:
-                                
-                                ForEach($store.products) { $product in
-                                    
-                                    ProductRow(product: $product)
-                                }
-                                
-                            case .semi:
-                                
-                                ForEach(filteredSemiProducts) { semi in
-                                    
-                                    SemiRow(
-                                        store: store,
-                                        semi: semi
-                                    )
-                                }
-                            }
-                        }
+                        DashboardView(
+                            showMenu: $showMenu,
+                            showSchedule: $showSchedule,
+                            store: store
+                        )
                         .padding(.horizontal)
                         .padding(.bottom, 40)
                     }
