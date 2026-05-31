@@ -11,6 +11,13 @@ struct ChatView: View {
         ChatService()
 
     @State private var text = ""
+    @State private var showWriteOffAlert = false
+    @State private var pendingWriteOffText = ""
+    @State private var writeOffMessage = ""
+    
+    
+    
+    
     @EnvironmentObject var store: InventoryStore
     
     func isWriteOffRequest(_ text: String) -> Bool {
@@ -37,34 +44,69 @@ struct ChatView: View {
             return
         }
 
-        var productName = lower
+        var searchProductName = lower
 
-        productName = productName
+        searchProductName = searchProductName
             .replacingOccurrences(of: "списать", with: "")
             .replacingOccurrences(of: "спишите", with: "")
+            .replacingOccurrences(of: "списание", with: "")
             .replacingOccurrences(of: amountWord, with: "")
+            .replacingOccurrences(of: "на персонал", with: "")
+            .replacingOccurrences(of: "персонал", with: "")
+            .replacingOccurrences(of: "порча", with: "")
+            .replacingOccurrences(of: "дегустация", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard let index = store.products.firstIndex(where: {
 
-            $0.name.lowercased().contains(productName)
+            $0.name.lowercased().contains(searchProductName)
 
         }) else {
 
-            print("Продукт не найден: \(productName)")
+            print("Продукт не найден: \(searchProductName)")
             return
         }
+
+        let realProductName = store.products[index].name
 
         store.products[index].quantityInGrams -= amount
 
         if store.products[index].quantityInGrams < 0 {
-
             store.products[index].quantityInGrams = 0
         }
 
+        let reason: String
+
+        if lower.contains("персонал") {
+
+            reason = "Персонал"
+
+        } else if lower.contains("порча") {
+
+            reason = "Порча"
+
+        } else if lower.contains("дегустация") {
+
+            reason = "Дегустация"
+
+        } else {
+
+            reason = "Другое"
+        }
+
+        let record = WriteOffRecord(
+            productName: realProductName,
+            grams: amount,
+            reason: reason,
+            employee: auth.employeeName
+        )
+
+        store.writeOffs.append(record)
+
         store.save()
 
-        print("Списано \(amount) г из \(store.products[index].name)")
+        print("Списано \(amount) г из \(realProductName)")
+    
     }
     var body: some View {
 
@@ -114,7 +156,8 @@ struct ChatView: View {
 
                                 Button {
 
-                                    processWriteOff(msg.text)
+                                    pendingWriteOffText = msg.text
+                                    showWriteOffAlert = true
 
                                 } label: {
 
@@ -202,6 +245,22 @@ struct ChatView: View {
             Color.black.ignoresSafeArea()
         )
         .navigationTitle("Чат")
+        .alert(
+            "Подтвердить списание",
+            isPresented: $showWriteOffAlert
+        ) {
+
+            Button("Отмена", role: .cancel) { }
+
+            Button("Списать") {
+
+                processWriteOff(pendingWriteOffText)
+            }
+
+        } message: {
+
+            Text(pendingWriteOffText)
+        }
         .onAppear {
 
             service.listen(

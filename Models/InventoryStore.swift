@@ -13,6 +13,7 @@ final class InventoryStore: ObservableObject {
 
     // ЗАКАЗЫ
     @Published var orders: [Order] = []
+    @Published var writeOffs: [WriteOffRecord] = []
 
     private let productsKey = "products_key"
 
@@ -21,6 +22,7 @@ final class InventoryStore: ObservableObject {
     private let dishesKey = "dishes_key"
 
     private let ordersKey = "orders_key"
+    private let writeOffsKey = "writeoffs_key"
 
     init() {
         load()
@@ -38,6 +40,13 @@ final class InventoryStore: ObservableObject {
                 encoded,
                 forKey: productsKey
             )
+            if let encoded = try? JSONEncoder().encode(writeOffs) {
+
+                UserDefaults.standard.set(
+                    encoded,
+                    forKey: writeOffsKey
+                )
+            }
         }
 
         // SEMI
@@ -86,6 +95,17 @@ final class InventoryStore: ObservableObject {
            ) {
 
             products = decoded
+            
+            if let data = UserDefaults.standard.data(
+                forKey: writeOffsKey
+            ),
+            let decoded = try? JSONDecoder().decode(
+                [WriteOffRecord].self,
+                from: data
+            ) {
+
+                writeOffs = decoded
+            }
         }
 
         // SEMI
