@@ -1,0 +1,1646 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>FoodX WEB</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:
+        radial-gradient(circle at top left,#ff7b0015,transparent 30%),
+        radial-gradient(circle at top right,#ff2d5512,transparent 25%),
+        radial-gradient(circle at bottom,#ffffff08,transparent 40%),
+        #0b0b0c;
+
+    color:white;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+
+    padding:20px;
+
+    min-height:100vh;
+    /* IOS CALENDAR */
+
+    .monthCard{
+
+        margin-top:24px;
+
+        padding:20px;
+
+        border-radius:26px;
+
+        background:
+            rgba(255,255,255,0.03);
+
+        border:
+            1px solid rgba(255,255,255,0.04);
+    }
+
+    .monthTitle{
+
+        font-size:20px;
+
+        font-weight:800;
+
+        margin-bottom:18px;
+
+        color:#ff9500;
+    }
+
+    .weekDays{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(7,1fr);
+
+        margin-bottom:10px;
+
+        opacity:0.5;
+
+        text-align:center;
+
+        font-size:13px;
+    }
+
+    .iosMonthGrid{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(7,1fr);
+
+        gap:10px;
+    }
+
+    .iosCalendarDay{
+
+        aspect-ratio:1;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:18px;
+
+        background:
+            rgba(255,255,255,0.04);
+
+        font-weight:700;
+
+        transition:0.2s;
+
+        font-size:15px;
+    }
+
+    .activeCalendarDay{
+
+        background:
+            linear-gradient(
+                135deg,
+                #22c55e,
+                #16a34a
+            );
+
+        box-shadow:
+            0 8px 18px
+            rgba(34,197,94,0.35);
+    }
+
+    .activeCalendarDay:hover{
+
+        transform:scale(1.06);
+    }
+
+    @media (max-width:768px){
+
+        .iosMonthGrid{
+
+            gap:6px;
+        }
+
+        .iosCalendarDay{
+
+            border-radius:12px;
+
+            font-size:13px;
+        }
+
+        .weekDays{
+
+            font-size:11px;
+        }
+    }
+}
+
+/* TOPBAR */
+
+.topbar{
+
+    display:flex;
+    
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    margin-bottom:28px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:999;
+
+    backdrop-filter:blur(24px);
+
+    background:
+        rgba(15,15,15,0.72);
+
+    padding:14px;
+
+    border-radius:26px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.06);
+
+    box-shadow:
+        0 10px 40px
+        rgba(0,0,0,0.35);
+
+    overflow:auto;
+}
+
+.topbar button{
+
+    flex:1;
+    
+    border:none;
+
+    padding:16px 22px;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9500,
+            #ff5e3a
+        );
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+}
+
+/* TITLES */
+
+h1{
+
+    font-size:38px;
+
+    margin-bottom:24px;
+
+    font-weight:800;
+}
+
+/* SEARCH */
+
+.search{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:22px;
+
+    margin-bottom:24px;
+
+    background:
+        rgba(255,255,255,0.05);
+
+    color:white;
+
+    font-size:16px;
+
+    backdrop-filter:blur(18px);
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+}
+
+/* CARD */
+
+.card{
+
+    background:
+        rgba(28,28,30,0.72);
+
+    border-radius:30px;
+
+    padding:24px;
+
+    margin-bottom:22px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.06);
+
+    backdrop-filter:blur(24px);
+
+    box-shadow:
+
+        0 10px 40px
+        rgba(0,0,0,0.35),
+
+        inset 0 1px 0
+        rgba(255,255,255,0.03);
+
+    transition:0.25s;
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+        0 18px 50px
+        rgba(0,0,0,0.45);
+}
+
+.title{
+
+    font-size:28px;
+
+    font-weight:800;
+}
+
+.category{
+
+    margin-top:8px;
+
+    color:#ff9500;
+
+    font-weight:600;
+}
+
+.grams{
+
+    margin-top:12px;
+
+    opacity:0.7;
+}
+
+.section{
+
+    margin-top:24px;
+}
+
+.section h3{
+
+    color:#ff9500;
+
+    margin-bottom:14px;
+}
+
+.ingredient{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    padding:14px;
+
+    border-radius:16px;
+
+    margin-bottom:10px;
+}
+
+.instruction{
+
+    line-height:1.7;
+
+    opacity:0.92;
+}
+
+/* LOGIN */
+
+.login{
+
+    max-width:420px;
+
+    margin:90px auto;
+
+    padding:28px;
+
+    border-radius:32px;
+
+    background:
+        rgba(28,28,30,0.72);
+
+    backdrop-filter:blur(22px);
+
+    border:
+        1px solid rgba(255,255,255,0.06);
+}
+
+.login button{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9500,
+            #ff5e3a
+        );
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.error{
+
+    color:#ff453a;
+
+    margin-top:16px;
+}
+
+/* CALENDAR */
+
+.calendar{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(7,1fr);
+
+    gap:10px;
+
+    margin-top:20px;
+}
+
+.day{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    text-align:center;
+}
+
+.active{
+
+    background:
+        linear-gradient(
+            135deg,
+            #22c55e,
+            #16a34a
+        );
+
+    font-weight:700;
+}
+
+/* CHAT */
+
+.chatMessages{
+
+    padding-bottom:120px;
+}
+
+.chatBubble{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border-radius:22px;
+
+    padding:18px;
+
+    margin-bottom:14px;
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+}
+
+.chatTop{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:10px;
+}
+
+.chatSender{
+
+    color:#ff9500;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+.onlineDot{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+}
+
+.chatTime{
+
+    color:#bdbdbd;
+
+    font-size:13px;
+}
+
+.chatText{
+
+    line-height:1.6;
+}
+
+.chatInputWrap{
+
+    position:fixed;
+
+    bottom:20px;
+
+    left:20px;
+
+    right:20px;
+
+    display:flex;
+
+    gap:12px;
+
+    padding:14px;
+
+    border-radius:26px;
+
+    backdrop-filter:blur(20px);
+
+    background:
+        rgba(15,15,15,0.72);
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+}
+
+.chatInputWrap input{
+
+    margin:0;
+}
+
+.chatInputWrap button{
+
+    min-width:70px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff9500,
+            #ff5e3a
+        );
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+}
+
+/* LOADING */
+
+.loading{
+
+    text-align:center;
+
+    margin-top:120px;
+
+    opacity:0.6;
+
+    font-size:24px;
+}
+    .scheduleHeader{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        cursor:pointer;
+    }
+
+    .employeeName{
+
+        font-size:24px;
+
+        font-weight:800;
+    }
+
+    .employeeSub{
+
+        margin-top:6px;
+
+        color:#ff9500;
+
+        opacity:0.8;
+
+        font-size:14px;
+    }
+
+    .arrow{
+
+        font-size:28px;
+
+        transition:0.3s;
+    }
+
+    .calendarHidden{
+
+        max-height:0;
+
+        overflow:hidden;
+
+        opacity:0;
+
+        transition:
+            max-height 0.45s ease,
+            opacity 0.3s ease,
+            margin-top 0.3s ease;
+
+        margin-top:0;
+    }
+
+    .calendarHidden.opened{
+
+        max-height:2000px;
+
+        opacity:1;
+
+        margin-top:22px;
+    }
+
+    .monthBlock{
+
+        margin-bottom:24px;
+    }
+
+    .monthTitle{
+
+        font-size:18px;
+
+        font-weight:700;
+
+        margin-bottom:14px;
+
+        color:#ff9500;
+    }
+
+    .iosCalendar{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(auto-fill,minmax(52px,1fr));
+
+        gap:12px;
+    }
+
+    .iosDay{
+
+        height:52px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:18px;
+
+        font-weight:700;
+
+        font-size:15px;
+
+        backdrop-filter:blur(12px);
+
+        transition:0.2s;
+    }
+
+    .activeDay{
+
+        background:
+            linear-gradient(
+                135deg,
+                #22c55e,
+                #16a34a
+            );
+
+        box-shadow:
+            0 8px 20px
+            rgba(34,197,94,0.3);
+    }
+
+    .activeDay:hover{
+
+        transform:scale(1.05);
+    }
+    /* MOBILE */
+
+    @media (max-width: 768px){
+
+        body{
+
+            padding:12px;
+        }
+
+        h1{
+
+            font-size:28px;
+        }
+
+        .topbar{
+
+            gap:8px;
+
+            padding:10px;
+
+            border-radius:18px;
+
+            overflow-x:auto;
+        }
+
+        .topbar button{
+
+            padding:12px 16px;
+
+            font-size:13px;
+
+            border-radius:14px;
+
+            flex:none;
+        }
+
+        .card{
+
+            padding:18px;
+
+            border-radius:22px;
+        }
+
+        .title{
+
+            font-size:22px;
+        }
+
+        .search{
+
+            padding:14px;
+
+            font-size:15px;
+
+            border-radius:16px;
+        }
+
+        .chatInputWrap{
+
+            left:12px;
+
+            right:12px;
+
+            bottom:12px;
+
+            padding:10px;
+
+            border-radius:18px;
+        }
+
+        .chatInputWrap button{
+
+            min-width:58px;
+
+            border-radius:14px;
+        }
+
+        .calendar{
+
+            grid-template-columns:
+                repeat(4,1fr);
+        }
+
+        .iosCalendar{
+
+            grid-template-columns:
+                repeat(4,1fr);
+        }
+
+        .iosDay{
+
+            height:44px;
+
+            font-size:14px;
+
+            border-radius:14px;
+        }
+
+        .employeeName{
+
+            font-size:20px;
+        }
+
+        .monthTitle{
+
+            font-size:16px;
+        }
+    }
+</style>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    collection,
+    addDoc,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp,
+    updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    setPersistence,
+    browserLocalPersistence,
+    onAuthStateChanged,
+    signOut
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyCbu1jS4WTke68HfYr_Oo9hGriOGJ6b8MM",
+
+    authDomain:
+        "foodxnew.firebaseapp.com",
+
+    projectId:
+        "foodxnew",
+
+    storageBucket:
+        "foodxnew.firebasestorage.app",
+
+    messagingSenderId:
+        "854058063966",
+
+    appId:
+        "1:854058063966:web:97ef85b42195c6ff687ccf"
+};
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
+
+const auth =
+    getAuth(app);
+
+await setPersistence(
+    auth,
+    browserLocalPersistence
+);
+
+const restaurantId =
+    "6A0C27E2-2B87-4EB3-9576-6AC17129727D";
+
+let currentEmployeeName = "WEB";
+let currentEmployeeId = null;
+let onlineEmployees = {};
+
+/* LOGIN */
+
+function showLogin(){
+
+    document.body.innerHTML = `
+
+        <div class="login">
+
+            <h1>FoodX WEB</h1>
+
+            <input
+                id="email"
+                class="search"
+                placeholder="Email"
+            >
+
+            <input
+                id="password"
+                type="password"
+                class="search"
+                placeholder="Password"
+            >
+
+            <button id="loginBtn">
+                Войти
+            </button>
+
+            <div
+                id="error"
+                class="error"
+            ></div>
+
+        </div>
+    `;
+
+    document
+        .getElementById("loginBtn")
+        .onclick = login;
+}
+
+async function login(){
+
+    const email =
+        document.getElementById("email").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    try{
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+    }catch(error){
+
+        document
+            .getElementById("error")
+            .innerText =
+                "Ошибка входа";
+    }
+}
+
+/* AUTH */
+
+    onAuthStateChanged(auth, async (user) => {
+
+        if(user){
+
+            currentEmployeeId =
+                user.uid;
+
+            const employeeRef = doc(
+                db,
+                "restaurants",
+                restaurantId,
+                "employees",
+                user.uid
+            );
+
+            onSnapshot(employeeRef, async snap => {
+
+                if(!snap.exists()){
+
+                    currentEmployeeName = "WEB";
+
+                    loadMenu();
+
+                    return;
+                }
+
+                const employee =
+                    snap.data();
+
+                currentEmployeeName =
+                    employee.name ||
+                    employee.fullName ||
+                    employee.email ||
+                    "WEB";
+
+                try{
+
+                    await updateDoc(employeeRef,{
+                        isOnline:true
+                    });
+
+                }catch(e){}
+
+                loadMenu();
+            });
+
+        }else{
+
+            showLogin();
+        }
+    });
+
+/* LOGOUT */
+
+window.logout = async function(){
+
+    await signOut(auth);
+
+    showLogin();
+};
+
+/* TOPBAR */
+
+function renderTopbar(){
+
+    return `
+        <div class="topbar">
+
+            <button onclick="loadMenu()">
+                Меню
+            </button>
+
+            <button onclick="loadSemi()">
+                Полуфабрикаты
+            </button>
+
+            <button onclick="loadSchedule()">
+                График
+            </button>
+
+            <button onclick="loadChat()">
+                Чат
+            </button>
+
+            <button onclick="logout()">
+                Выйти
+            </button>
+
+        </div>
+    `;
+}
+
+/* MENU */
+
+window.loadMenu = function(){
+
+    const ref =
+        doc(db,"menus","main");
+
+    onSnapshot(ref,snap => {
+
+        const data =
+            snap.data();
+
+        const dishes =
+            data?.dishes || [];
+
+        document.body.innerHTML = `
+
+            ${renderTopbar()}
+
+            <h1>Меню</h1>
+
+            <input
+                id="search"
+                class="search"
+                placeholder="Поиск блюда"
+            >
+
+            <div id="content"></div>
+        `;
+
+        const content =
+            document.getElementById("content");
+
+        function render(filter=""){
+
+            content.innerHTML = "";
+
+            dishes
+                .filter(d =>
+                    d.name
+                    ?.toLowerCase()
+                    .includes(
+                        filter.toLowerCase()
+                    )
+                )
+                .forEach(dish => {
+
+                let ingredientsHTML = "";
+
+                (dish.ingredients || [])
+                .forEach(i => {
+
+                    ingredientsHTML += `
+                        <div class="ingredient">
+                            ${i.name || ""}
+                            —
+                            ${i.grams || 0} г
+                        </div>
+                    `;
+                });
+
+                content.innerHTML += `
+
+                    <div class="card">
+
+                        <div class="title">
+                            ${dish.name || ""}
+                        </div>
+
+                        <div class="category">
+                            ${dish.category || ""}
+                        </div>
+
+                        <div class="grams">
+                            ${dish.grams || 0} г
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Ингредиенты</h3>
+
+                            ${ingredientsHTML}
+
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Технология</h3>
+
+                            <div class="instruction">
+
+                                ${dish.instruction || ""}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        render();
+
+        document
+            .getElementById("search")
+            .oninput = e => {
+
+            render(e.target.value);
+        };
+    });
+};
+
+/* SEMI */
+
+   
+
+    window.loadSemi = function(){
+
+        const semiRef =
+            collection(db,"semi");
+
+        onSnapshot(semiRef,(snapshot)=>{
+
+            let semiProducts = [];
+
+            snapshot.forEach(docSnap=>{
+
+                const data = docSnap.data();
+
+                if(data.semiProducts){
+
+                    semiProducts.push(...data.semiProducts);
+                }
+            });
+
+            document.body.innerHTML = `
+
+                ${renderTopbar()}
+
+                <h1>Полуфабрикаты</h1>
+
+                <div id="content"></div>
+            `;
+
+            const content =
+                document.getElementById("content");
+
+            if(semiProducts.length === 0){
+
+                content.innerHTML = `
+                    <div class="card">
+                        Полуфабрикаты не найдены
+                    </div>
+                `;
+
+                return;
+            }
+
+            semiProducts.forEach(semi=>{
+
+                let ingredientsHTML = "";
+
+                (semi.ingredients || [])
+                .forEach(i=>{
+
+                    ingredientsHTML += `
+                        <div class="ingredient">
+                            ${i.name || ""}
+                            —
+                            ${i.grams || 0} г
+                        </div>
+                    `;
+                });
+
+                content.innerHTML += `
+
+                    <div class="card">
+
+                        <div class="title">
+                            ${semi.name || "Без названия"}
+                        </div>
+
+                        <div class="grams">
+                            Выход:
+                            ${semi.grams || 0} г
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Ингредиенты</h3>
+
+                            ${ingredientsHTML}
+
+                        </div>
+
+                        <div class="section">
+
+                            <h3>Технология</h3>
+
+                            <div class="instruction">
+
+                                ${semi.instruction || "Нет описания"}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            });
+        });
+    };
+
+   
+/* SCHEDULE */
+
+    
+
+    
+    window.loadSchedule = function(){
+
+        const schedulesRef =
+            collection(db,"schedules");
+
+        onSnapshot(schedulesRef,(snapshot)=>{
+
+            let employees = [];
+
+            snapshot.forEach(docSnap=>{
+
+                const data = docSnap.data();
+
+                if(data.employees){
+
+                    employees.push(...data.employees);
+                }
+            });
+
+            document.body.innerHTML = `
+
+                ${renderTopbar()}
+
+                <h1>График</h1>
+
+                <div id="scheduleWrap"></div>
+            `;
+
+            const wrap =
+                document.getElementById("scheduleWrap");
+
+            if(employees.length === 0){
+
+                wrap.innerHTML = `
+                    <div class="card">
+                        График пуст
+                    </div>
+                `;
+
+                return;
+            }
+
+            employees.forEach((emp,index)=>{
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "card";
+
+                let monthsHTML = "";
+
+                const monthDays =
+                    emp.monthDays || {};
+
+                Object.keys(monthDays)
+                .forEach(month=>{
+
+                    const activeDays =
+                        monthDays[month] || [];
+
+                    const daysInMonth = 31;
+
+                    let calendarHTML = "";
+
+                    for(let day = 1; day <= daysInMonth; day++){
+
+                        const active =
+                            activeDays.includes(day);
+
+                        calendarHTML += `
+
+                            <div class="
+                                iosCalendarDay
+                                ${active ? "activeCalendarDay" : ""}
+                            ">
+
+                                ${day}
+
+                            </div>
+                        `;
+                    }
+
+                    monthsHTML += `
+
+                        <div class="monthCard">
+
+                            <div class="monthTitle">
+
+                                ${month}
+
+                            </div>
+
+                            <div class="weekDays">
+
+                                <div>Пн</div>
+                                <div>Вт</div>
+                                <div>Ср</div>
+                                <div>Чт</div>
+                                <div>Пт</div>
+                                <div>Сб</div>
+                                <div>Вс</div>
+
+                            </div>
+
+                            <div class="iosMonthGrid">
+
+                                ${calendarHTML}
+
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+
+                    <div
+                        class="scheduleHeader"
+                        onclick="toggleSchedule(${index})"
+                    >
+
+                        <div>
+
+                            <div class="employeeName">
+
+                                ${emp.name || "Сотрудник"}
+
+                            </div>
+
+                            <div class="employeeSub">
+
+                                Нажми чтобы открыть календарь
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="arrow-${index}"
+                            class="arrow"
+                        >
+                            ⌄
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="calendar-${index}"
+                        class="calendarHidden"
+                    >
+
+                        ${monthsHTML}
+
+                    </div>
+                `;
+
+                wrap.appendChild(card);
+            });
+
+            window.toggleSchedule = function(index){
+
+                const calendar =
+                    document.getElementById(
+                        `calendar-${index}`
+                    );
+
+                const arrow =
+                    document.getElementById(
+                        `arrow-${index}`
+                    );
+
+                if(calendar.classList.contains("opened")){
+
+                    calendar.classList.remove("opened");
+
+                    arrow.style.transform =
+                        "rotate(0deg)";
+
+                }else{
+
+                    calendar.classList.add("opened");
+
+                    arrow.style.transform =
+                        "rotate(180deg)";
+                }
+            };
+        });
+    };
+
+
+    
+
+/* CHAT */
+
+window.loadChat = function(){
+
+    document.body.innerHTML = `
+
+        ${renderTopbar()}
+
+        <h1>Командный чат</h1>
+
+        <div
+            id="messages"
+            class="chatMessages"
+        ></div>
+
+        <div class="chatInputWrap">
+
+            <input
+                id="chatInput"
+                class="search"
+                placeholder="Сообщение..."
+            >
+
+            <button id="sendBtn">
+                ➤
+            </button>
+
+        </div>
+    `;
+
+    const messages =
+        document.getElementById("messages");
+
+    const input =
+        document.getElementById("chatInput");
+
+    const sendBtn =
+        document.getElementById("sendBtn");
+
+    const employeesRef = collection(
+        db,
+        "restaurants",
+        restaurantId,
+        "employees"
+    );
+
+    onSnapshot(employeesRef, snapshot => {
+
+        onlineEmployees = {};
+
+        snapshot.forEach(docSnap => {
+
+            const employee =
+                docSnap.data();
+
+            const name =
+                employee.name ||
+                employee.fullName ||
+                employee.email;
+
+            onlineEmployees[name] =
+                employee.isOnline || false;
+        });
+    });
+
+    const q = query(
+        collection(
+            db,
+            "restaurants",
+            restaurantId,
+            "chat"
+        ),
+        orderBy("createdAt")
+    );
+
+    onSnapshot(q, snapshot => {
+
+        messages.innerHTML = "";
+
+        snapshot.forEach(docSnap => {
+
+            const msg =
+                docSnap.data();
+
+            const isOnline =
+                onlineEmployees[msg.sender];
+
+            let time = "";
+
+            if(msg.createdAt){
+
+                const date =
+                    msg.createdAt.toDate();
+
+                time =
+                    date.toLocaleTimeString(
+                        "ru-RU",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    );
+            }
+
+            messages.innerHTML += `
+
+                <div class="chatBubble">
+
+                    <div class="chatTop">
+
+                        <div class="chatSender">
+
+                            <div
+                                class="onlineDot"
+                                style="
+                                    background:
+                                    ${
+                                        isOnline
+                                        ? '#22c55e'
+                                        : '#666'
+                                    };
+                                "
+                            ></div>
+
+                            ${msg.sender || "WEB"}
+
+                        </div>
+
+                        <div class="chatTime">
+
+                            ${time}
+
+                        </div>
+
+                    </div>
+
+                    <div class="chatText">
+
+                        ${msg.text || ""}
+
+                    </div>
+
+                </div>
+            `;
+        });
+
+        window.scrollTo(
+            0,
+            document.body.scrollHeight
+        );
+    });
+
+    sendBtn.onclick = async () => {
+        
+        const text =
+        input.value.trim();
+        
+        if(!text) return;
+        
+        await addDoc(
+                     collection(
+                                db,
+                                "restaurants",
+                                restaurantId,
+                                "chat"
+                                ),
+                     {
+                         sender: currentEmployeeName,
+                         senderId: currentEmployeeId,
+                         text: text,
+                         createdAt: serverTimestamp()
+                     }
+                     );
+                     input.value = "";
+                 };
+             };
+
+             window.loadMenu();
+</script>
+
+</head>
+
+<body>
+
+<div class="loading">
+    Загрузка...
+</div>
+
+</body>
+</html>

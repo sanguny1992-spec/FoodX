@@ -16,11 +16,19 @@ struct FoodXnewApp: App {
         WindowGroup {
             
             if auth.user == nil {
-                
+
                 LoginView(auth: auth)
-                
+
+            } else if auth.employeeStatus == "pending" {
+
+                PendingView()
+
+            } else if auth.employeeStatus == "blocked" {
+
+                BlockedView()
+
             } else {
-                
+
                 ContentView()
                     .environmentObject(auth)
             }

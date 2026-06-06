@@ -11,14 +11,22 @@ final class AuthManager: ObservableObject {
 
     @Published var employeeName = ""
 
-    private let db =
-        Firestore.firestore()
+    @Published var restaurantId = ""
+
+    @Published var employeeStatus = "pending"
+
+    @Published var employeeRole = "employee"
+
+    private let db = Firestore.firestore()
 
     init() {
 
         self.user = Auth.auth().currentUser
 
         if let currentUser = self.user {
+            
+            print("CURRENT USER UID:", currentUser.uid)
+            
 
             self.userId = currentUser.uid
 
@@ -28,34 +36,60 @@ final class AuthManager: ObservableObject {
         }
     }
 
-    // MARK: - LOAD EMPLOYEE
-
     func loadEmployeeData(uid: String) {
 
-        db.collection("restaurants")
-            .document("6A0C27E2-2B87-4EB3-9576-6AC17129727D")
-            .collection("employees")
-            .document(uid)
-            .getDocument { snapshot, error in
+        print("SEARCH UID:", uid)
 
-                guard let data = snapshot?.data()
-                else {
+        db.collectionGroup("employees")
+            .whereField("id", isEqualTo: uid)
+            .getDocuments { snapshot, error in
+
+                if let error {
+
+                    print("ERROR:", error.localizedDescription)
                     return
                 }
+
+                print("FOUND DOCS:",
+                      snapshot?.documents.count ?? 0)
+
+                guard let document =
+                    snapshot?.documents.first
+                else {
+
+                    print("EMPLOYEE NOT FOUND")
+                    return
+                }
+
+                let data = document.data()
+
+                print("EMPLOYEE DATA:", data)
 
                 DispatchQueue.main.async {
 
                     self.employeeName =
-                        data["fullName"] as? String
-                        ??
                         data["name"] as? String
-                        ??
-                        "Сотрудник"
+                        ?? "Сотрудник"
+
+                    self.employeeStatus =
+                        data["status"] as? String
+                        ?? "pending"
+
+                    self.employeeRole =
+                        data["role"] as? String
+                        ?? "employee"
+
+                    self.restaurantId =
+                        data["restaurantId"] as? String
+                        ?? ""
+
+                    print("NAME:", self.employeeName)
+                    print("ROLE:", self.employeeRole)
+                    print("STATUS:", self.employeeStatus)
+                    print("RESTAURANT:", self.restaurantId)
                 }
             }
     }
-
-    // MARK: - SIGN OUT
 
     func signOut() {
 
@@ -64,9 +98,7 @@ final class AuthManager: ObservableObject {
             try Auth.auth().signOut()
 
             self.user = nil
-
             self.userId = ""
-
             self.employeeName = ""
 
         } catch {
@@ -74,8 +106,6 @@ final class AuthManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
-
-    // MARK: - LOGOUT
 
     func logout() {
 

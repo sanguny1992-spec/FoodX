@@ -121,7 +121,7 @@ struct RegisterView: View {
                                 name: name,
                                 email: email,
                                 restaurantId: restaurantId,
-                                role: "admin"
+                                role: "owner"
                             )
                         
                         DispatchQueue.main.async {
