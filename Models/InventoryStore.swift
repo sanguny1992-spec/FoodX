@@ -206,4 +206,70 @@ final class InventoryStore: ObservableObject {
             }
         }
     }
+    func findProduct(from text: String) -> Product? {
+
+        let lower = text.lowercased()
+
+        return products.first(where: {
+            lower.contains($0.name.lowercased())
+        })
+    }
+    func extractGrams(from text: String) -> Double? {
+
+        let pattern = #"(\d+)\s*(кг|kg|г|g)"#
+
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+
+        let range = NSRange(text.startIndex..., in: text)
+
+        guard let match = regex.firstMatch(in: text, range: range),
+              let valueRange = Range(match.range(at: 1), in: text) else {
+            return nil
+        }
+
+        let value = Double(text[valueRange]) ?? 0
+
+        if text.lowercased().contains("кг") || text.lowercased().contains("kg") {
+            return value * 1000
+        }
+
+        return value
+    }
+    func writeOff(from message: String, employee: String) {
+
+        guard let product = findProduct(from: message) else {
+            print("❌ Продукт не найден")
+            return
+        }
+
+        guard let grams = extractGrams(from: message) else {
+            print("❌ Не удалось понять количество")
+            return
+        }
+
+        guard let index = products.firstIndex(where: { $0.id == product.id }) else {
+            return
+        }
+
+        products[index].quantityInGrams -= grams
+
+        if products[index].quantityInGrams < 0 {
+            products[index].quantityInGrams = 0
+        }
+
+        writeOffs.append(
+            WriteOffRecord(
+                productName: product.name,
+                grams: grams,
+                reason: "Списание из чата",
+                employee: employee
+            )
+        )
+
+        save()
+
+        print("✅ Списано \(grams) г \(product.name)")
+    }
 }
