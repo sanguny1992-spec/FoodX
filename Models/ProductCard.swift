@@ -2,43 +2,39 @@ import SwiftUI
 
 struct ProductCard: View {
 
-    let product: Product
+    var product: Product
+
+    var onDelete: () -> Void
+    var onSave: () -> Void
 
     var body: some View {
 
-        VStack(
-            alignment: .leading,
-            spacing: 10
-        ) {
+        VStack(alignment: .leading, spacing: 10) {
 
             Text(product.name)
                 .font(.headline)
+                .foregroundColor(.white)
 
-            Text(
-                "\(Int(product.quantityInGrams)) г"
-            )
-            .foregroundColor(.orange)
-
-            if let price = product.pricePerKg {
-
-                Text(
-                    "\(price.formatted()) €/кг"
-                )
+            Text("Кол-во: \(Int(product.quantityInGrams)) г")
                 .foregroundColor(.gray)
+
+            HStack {
+
+                Button("Сохранить") {
+                    onSave()
+                }
+                .foregroundColor(.green)
+
+                Spacer()
+
+                Button("Удалить") {
+                    onDelete()
+                }
+                .foregroundColor(.red)
             }
         }
-        .frame(
-            maxWidth: .infinity,
-            alignment: .leading
-        )
         .padding()
-        .background(
-            Color.white.opacity(0.06)
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 20
-            )
-        )
+        .background(Color.white.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }

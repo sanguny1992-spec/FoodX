@@ -136,7 +136,7 @@ struct EmployeeRegisterView: View {
                     name: name,
                     email: email,
                     restaurantId: restaurant.id,
-                    role: "employee"
+                    role: "owner"
                 )
                 
                 DispatchQueue.main.async {

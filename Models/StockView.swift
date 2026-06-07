@@ -7,14 +7,11 @@ struct StockView: View {
     @State private var searchText = ""
 
     var filteredProducts: [Product] {
-
         searchText.isEmpty
         ? store.products
         : store.products.filter {
-
-            $0.name.lowercased().contains(
-                searchText.lowercased()
-            )
+            $0.name.lowercased()
+                .contains(searchText.lowercased())
         }
     }
 
@@ -24,32 +21,37 @@ struct StockView: View {
 
             VStack(spacing: 14) {
 
-                TextField(
-                    "Поиск...",
-                    text: $searchText
-                )
-                .padding(14)
-                .background(
-                    Color.white.opacity(0.08)
-                )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 16
-                    )
-                )
+                // MARK: - SEARCH
+                TextField("Поиск...", text: $searchText)
+                    .padding(14)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .foregroundColor(.white)
 
-                ForEach(filteredProducts) { product in
-
-                    ProductCard(
-                        product: product
-                    )
+                // MARK: - LIST
+                if filteredProducts.isEmpty {
+                    Text("Склад пуст")
+                        .foregroundColor(.gray)
+                        .padding(.top, 40)
+                } else {
+                    VStack(spacing: 12) {
+                        ForEach(filteredProducts) { product in
+                            ProductCard(
+                                product: product,
+                                onDelete: {
+                                    store.delete(product: product)
+                                },
+                                onSave: {
+                                    store.update(product: product)
+                                }
+                            )
+                        }
+                    }
                 }
             }
             .padding()
         }
         .navigationTitle("Склад")
-        .background(
-            Color.black.ignoresSafeArea()
-        )
+        .background(Color.black.ignoresSafeArea())
     }
 }

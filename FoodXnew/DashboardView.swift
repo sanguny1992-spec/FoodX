@@ -6,7 +6,7 @@ struct DashboardView: View {
     @Binding var showSchedule: Bool
     @State private var showSemi = false
     @State private var showWriteOffs = false
-
+    @EnvironmentObject var auth: AuthManager
     @ObservedObject var store: InventoryStore
 
     var body: some View {
@@ -35,9 +35,9 @@ struct DashboardView: View {
                     )
                 }
 
-                Button {
+                NavigationLink {
 
-                    showSemi = true
+                    SemiProductsView(store: store)
 
                 } label: {
 
@@ -45,6 +45,7 @@ struct DashboardView: View {
                         title: "Полуфабрикаты",
                         icon: "carrot.fill"
                     )
+                }
                 }
 
                 Button {
@@ -74,7 +75,7 @@ struct DashboardView: View {
                 NavigationLink {
 
                     ChatView(
-                        restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+                        restaurantId: auth.restaurantId
                     )
                     .environmentObject(store)
 
@@ -86,30 +87,18 @@ struct DashboardView: View {
                     )
                 }
 
-                Button {
+            NavigationLink {
 
-                    showWriteOffs = true
+                WriteOffsView(store: store)
 
-                } label: {
+            } label: {
 
-                    tile(
-                        title: "Списания",
-                        icon: "doc.text.fill"
-                    )
-                }
+                tile(
+                    title: "Списания",
+                    icon: "doc.text.fill"
+                )
             }
-        }
-        .sheet(isPresented: $showSemi) {
-
-            SemiProductsView(
-                store: store
-            )
-        }
-
-        .sheet(isPresented: $showWriteOffs) {
-
-            Text("Журнал списаний")
-                .font(.title)
+            }
         }
     }
 
@@ -153,9 +142,6 @@ struct DashboardView: View {
         .background(.ultraThinMaterial)
         .clipShape(
             RoundedRectangle(cornerRadius: 24)
-            
         )
     }
-    
-    
-}
+

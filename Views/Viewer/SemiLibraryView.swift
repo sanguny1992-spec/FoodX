@@ -119,7 +119,7 @@ struct SemiLibraryView: View {
         
         semiService.uploadSemiProducts(
             semiProducts: store.semiProducts,
-            restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+            restaurantId: "auth.restaurantId"
         ) { result in
             
             switch result {

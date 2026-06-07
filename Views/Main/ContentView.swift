@@ -46,12 +46,23 @@ struct ContentView: View {
                     VStack(spacing: 18) {
                         
                         VStack(spacing: 18) {
+                            
+                            Text(auth.restaurantName)
+                                .font(.title.bold())
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            
+                            Text(auth.restaurantName)
+                                .font(.title.bold())
+                                .foregroundColor(.white)
 
                             DashboardView(
                                 showMenu: $showMenu,
                                 showSchedule: $showSchedule,
                                 store: store
                             )
+                            .environmentObject(auth)
                             .padding(.horizontal)
                             .padding(.top, 90)
                             .padding(.bottom, 40)
@@ -89,7 +100,7 @@ struct ContentView: View {
                     NavigationLink {
                         
                         EmployeesView(
-                            restaurantId: "6A0C27E2-2B87-4EB3-9576-6AC17129727D"
+                            restaurantId: auth.restaurantId
                         )
                         
                     } label: {

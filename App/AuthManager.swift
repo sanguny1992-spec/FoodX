@@ -12,10 +12,12 @@ final class AuthManager: ObservableObject {
     @Published var employeeName = ""
 
     @Published var restaurantId = ""
-
+    
     @Published var employeeStatus = "pending"
 
     @Published var employeeRole = "employee"
+    
+    @Published var restaurantName = ""
 
     private let db = Firestore.firestore()
 
@@ -35,7 +37,27 @@ final class AuthManager: ObservableObject {
             )
         }
     }
+    func loadRestaurant(
+        restaurantId: String
+    ) {
 
+        db.collection("restaurants")
+            .document(restaurantId)
+            .getDocument { snapshot, error in
+
+                guard let data =
+                    snapshot?.data()
+                else {
+                    return
+                }
+
+                DispatchQueue.main.async {
+
+                    self.restaurantName =
+                        data["name"] as? String ?? ""
+                }
+            }
+    }
     func loadEmployeeData(uid: String) {
 
         print("SEARCH UID:", uid)
@@ -82,6 +104,10 @@ final class AuthManager: ObservableObject {
                     self.restaurantId =
                         data["restaurantId"] as? String
                         ?? ""
+                    
+                    self.loadRestaurant(
+                        restaurantId: self.restaurantId
+                    )
 
                     print("NAME:", self.employeeName)
                     print("ROLE:", self.employeeRole)
