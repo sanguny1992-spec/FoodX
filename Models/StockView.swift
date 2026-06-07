@@ -5,6 +5,8 @@ struct StockView: View {
     @ObservedObject var store: InventoryStore
 
     @State private var searchText = ""
+    
+    @State private var showAddProduct = false
 
     var filteredProducts: [Product] {
         searchText.isEmpty
@@ -27,7 +29,16 @@ struct StockView: View {
                     .background(Color.white.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .foregroundColor(.white)
-
+                    .sheet(isPresented: $showAddProduct) {
+                        AddProductView(store: store)
+                    }
+                Button {
+                    showAddProduct = true
+                } label: {
+                    Text("➕ Добавить продукт")
+                        .foregroundColor(.orange)
+                        .padding(.vertical, 8)
+                }
                 // MARK: - LIST
                 if filteredProducts.isEmpty {
                     Text("Склад пуст")
