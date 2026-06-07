@@ -5,7 +5,7 @@ struct StockView: View {
     @ObservedObject var store: InventoryStore
 
     @State private var searchText = ""
-    
+    @State private var selectedProduct: Product?
     @State private var showAddProduct = false
 
     var filteredProducts: [Product] {
@@ -29,9 +29,8 @@ struct StockView: View {
                     .background(Color.white.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .foregroundColor(.white)
-                    .sheet(isPresented: $showAddProduct) {
-                        AddProductView(store: store)
-                    }
+
+                // MARK: - ADD BUTTON
                 Button {
                     showAddProduct = true
                 } label: {
@@ -39,14 +38,20 @@ struct StockView: View {
                         .foregroundColor(.orange)
                         .padding(.vertical, 8)
                 }
+
                 // MARK: - LIST
                 if filteredProducts.isEmpty {
+
                     Text("Склад пуст")
                         .foregroundColor(.gray)
                         .padding(.top, 40)
+
                 } else {
+
                     VStack(spacing: 12) {
+
                         ForEach(filteredProducts) { product in
+
                             ProductCard(
                                 product: product,
                                 onDelete: {
@@ -56,6 +61,9 @@ struct StockView: View {
                                     store.update(product: product)
                                 }
                             )
+                            .onTapGesture {
+                                selectedProduct = product
+                            }
                         }
                     }
                 }
@@ -64,5 +72,15 @@ struct StockView: View {
         }
         .navigationTitle("Склад")
         .background(Color.black.ignoresSafeArea())
+
+        // MARK: - EDIT PRODUCT SHEET
+        .sheet(item: $selectedProduct) { product in
+            EditProductView(store: store, product: product)
+        }
+
+        // MARK: - ADD PRODUCT SHEET
+        .sheet(isPresented: $showAddProduct) {
+            AddProductView(store: store)
+        }
     }
 }

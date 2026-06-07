@@ -42,7 +42,18 @@ final class InventoryStore: ObservableObject {
         guard let index = products.firstIndex(where: { $0.id == product.id }) else { return }
         products[index] = product
     }
-    
+    func addOrIncrease(product: Product) {
+
+        if let index = products.firstIndex(where: {
+            $0.name.lowercased() == product.name.lowercased()
+        }) {
+            products[index].quantityInGrams += product.quantityInGrams
+        } else {
+            products.append(product)
+        }
+
+        save()
+    }
     func save() {
         
         if let encoded = try? JSONEncoder().encode(products) {
