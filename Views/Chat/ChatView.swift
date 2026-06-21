@@ -2,228 +2,353 @@ import SwiftUI
 import FirebaseFirestore
 
 struct ChatView: View {
-
+    
     let restaurantId: String
-
+    
     @EnvironmentObject var auth: AuthManager
     @EnvironmentObject var store: InventoryStore
-
+    
     @StateObject private var service = ChatService()
-
+    
     @State private var text = ""
-    @State private var showWriteOffAlert = false
-    @State private var pendingWriteOffText = ""
-
-    // MARK: - CHECK
-
+    
+    // MARK: candidates
+    @State private var showCandidatesSheet = false
+    @State private var candidates: [String] = []
+    @State private var selectedMessage = ""
+    
+    @State private var selectedProductName = ""
+    
+    @State private var showWriteOffEditor = false
+    @State private var draftItems: [WriteOffDraftItem] = []
+    
+    
+    // MARK: write off check
     func isWriteOffRequest(_ text: String) -> Bool {
         let lower = text.lowercased()
         return lower.contains("списать") ||
-               lower.contains("спишите") ||
-               lower.contains("списание")
+        lower.contains("спишите") ||
+        lower.contains("списание")
     }
+    func parseWriteOffMessage(_ text: String) -> [WriteOffDraftItem] {
 
-    // MARK: - WRITE OFF PARSER
+        var result: [WriteOffDraftItem] = []
 
-    func processWriteOff(_ text: String) {
+        let lines = text.components(separatedBy: .newlines)
 
-        let lower = text.lowercased()
+        for line in lines {
 
-        // 1. regex: число + единица (кг/г)
-        let pattern = #"(\d+(?:[.,]\d+)?)\s*(кг|г)?"#
+            let words = line.split(separator: " ")
 
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: lower,
-                                           range: NSRange(lower.startIndex..., in: lower)),
-              let range = Range(match.range(at: 1), in: lower)
+            guard words.count >= 2 else {
+                continue
+            }
+
+            guard let grams = Double(words.last!) else {
+                continue
+            }
+
+            let productName = words.dropLast().joined(separator: " ")
+
+            result.append(
+                WriteOffDraftItem(
+                    productName: productName,
+                    grams: grams
+                )
+            )
+        }
+
+        return result
+    }
+    // MARK: search
+    func findCandidates(from text: String) -> [String] {
+
+        let words = text.lowercased()
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { $0.count > 2 }
+
+        let allItems =
+            store.products.map { $0.name } +
+            store.semiProducts.map { $0.name }
+
+        var result: [String] = []
+
+        for item in allItems {
+
+            let itemLower = item.lowercased()
+
+            for word in words {
+
+                let root = String(word.prefix(4))
+
+                if itemLower.contains(root) {
+
+                    result.append(item)
+                    break
+                }
+            }
+        }
+
+        return Array(Set(result)).sorted()
+    }
+    
+    // MARK: apply write off
+    func applyWriteOff(message: String, selectedName: String) {
+        
+        let lower = message.lowercased()
+        
+        let pattern = #"(\d+(?:[.,]\d+)?)"#
+        
+        guard
+            let regex = try? NSRegularExpression(pattern: pattern),
+            let match = regex.firstMatch(in: lower, range: NSRange(lower.startIndex..., in: lower)),
+            let range = Range(match.range, in: lower)
         else {
             print("❌ не найдено количество")
             return
         }
-
-        var amountString = String(lower[range])
-            .replacingOccurrences(of: ",", with: ".")
-
-        guard var amount = Double(amountString) else {
+        
+        let amountString = String(lower[range]).replacingOccurrences(of: ",", with: ".")
+        
+        guard let amount = Double(amountString) else {
             print("❌ ошибка числа")
             return
         }
-
-        // 2. определяем единицы измерения
-        let unitRange = Range(match.range(at: 2), in: lower)
-        let unit = unitRange != nil ? String(lower[unitRange!]) : "г"
-
-        if unit.contains("кг") {
-            amount *= 1000
+        
+        // PRODUCTS
+        if let index = store.products.firstIndex(where: {
+            $0.name.lowercased().contains(selectedName.lowercased()) ||
+            selectedName.lowercased().contains($0.name.lowercased())
+            
+            
+            
+            
+        }) {
+            
+            store.products[index].quantityInGrams -= amount
+            if store.products[index].quantityInGrams < 0 {
+                store.products[index].quantityInGrams = 0
+            }
+            
+            store.writeOffs.append(
+                WriteOffRecord(
+                    productName: store.products[index].name,
+                    grams: amount,
+                    reason: "Чат",
+                    employee: auth.employeeName
+                )
+            )
+            
+            store.save()
         }
-
-        // 3. чистим текст от лишнего
-        var search = lower
-
-        let stopWords = [
-            "списать",
-            "спишите",
-            "списание",
-            "персонал",
-            "на персонал",
-            "порча",
-            "дегустация"
-        ]
-
-        for word in stopWords {
-            search = search.replacingOccurrences(of: word, with: "")
-        }
-
-        // убрать число + единицу
-        search = search.replacingOccurrences(of: amountString, with: "")
-        search = search.replacingOccurrences(of: unit, with: "")
-
-        search = search
-            .replacingOccurrences(of: "  ", with: " ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // 4. поиск продукта
-        guard let index = store.products.firstIndex(where: {
-            $0.name.lowercased().contains(search) ||
-            search.contains($0.name.lowercased())
-        }) else {
-            print("❌ Продукт не найден: \(search)")
-            return
-        }
-
-        let product = store.products[index]
-
-        // 5. списание
-        store.products[index].quantityInGrams -= amount
-        if store.products[index].quantityInGrams < 0 {
-            store.products[index].quantityInGrams = 0
-        }
-
-        // 6. запись
-        let record = WriteOffRecord(
-            productName: product.name,
-            grams: amount,
-            reason: "Чат списание",
-            employee: auth.employeeName
-        )
-
-        store.writeOffs.append(record)
-        store.save()
-
-        print("✅ Списано \(amount) г из \(product.name)")
     }
-
-    // MARK: - VIEW
-
+    
+    // MARK: BODY
     var body: some View {
-
-        VStack {
-
-            ScrollView {
-
-                LazyVStack(spacing: 14) {
-
-                    ForEach(service.messages) { msg in
-
-                        let isMe = msg.senderId ?? "" == auth.userId
-                        let isWriteOff = isWriteOffRequest(msg.text)
-
-                        VStack(alignment: isMe ? .trailing : .leading, spacing: 6) {
-
-                            HStack(spacing: 6) {
-                                Text(msg.sender)
-                                    .font(.caption.bold())
-                                    .foregroundColor(.orange)
-
-                                if let date = msg.createdAt?.dateValue() {
-                                    Text(date.formatted(date: .omitted, time: .shortened))
-                                        .font(.caption2)
-                                        .foregroundColor(.white.opacity(0.75))
+        
+        VStack(spacing: 0) {
+            
+            ScrollViewReader { proxy in
+                
+                ScrollView {
+                    
+                    LazyVStack(spacing: 14) {
+                        
+                        ForEach(service.messages) { msg in
+                            
+                            let isMe = msg.senderId ?? "" == auth.userId
+                            let isWriteOff = isWriteOffRequest(msg.text)
+                            
+                            VStack(alignment: isMe ? .trailing : .leading, spacing: 6) {
+                                
+                                HStack {
+                                    Text(msg.sender)
+                                        .font(.caption.bold())
+                                        .foregroundColor(.orange)
+                                    
+                                    if let date = msg.createdAt?.dateValue() {
+                                        Text(date.formatted(date: .omitted, time: .shortened))
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.7))
+                                        Color.clear
+                                            .frame(height: 1)
+                                            .id("BOTTOM")
+                                    }
+                                }
+                                
+                                Text(msg.text)
+                                    .foregroundColor(.white)
+                                
+                                if isWriteOff {
+                                    Button {
+                                        selectedMessage = msg.text
+                                        candidates = findCandidates(from: msg.text)
+                                        showCandidatesSheet = true
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "shippingbox.fill")
+                                            Text("Списать")
+                                        }
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 8)
+                                        .background(Color.orange)
+                                        .foregroundColor(.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    }
                                 }
                             }
+                            .padding()
+                            .background(isMe ? Color.orange.opacity(0.85) : Color.white.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .frame(maxWidth: .infinity, alignment: isMe ? .trailing : .leading)
+                        }
+                        Color.clear
+                            .frame(height: 1)
+                            .id("BOTTOM")
+                    }
+                    .padding(.bottom, 80)
 
-                            Text(msg.text)
-                                .foregroundColor(.white)
+                    .onChange(of: service.messages.count) { _ in
 
-                            if isWriteOff {
+                        DispatchQueue.main.async {
 
-                                Button {
+                            withAnimation {
 
-                                    pendingWriteOffText = msg.text
-                                    showWriteOffAlert = true
-
-                                } label: {
-
-                                    HStack {
-                                        Image(systemName: "shippingbox.fill")
-                                        Text("Запрос на списание")
-                                    }
-                                    .font(.caption.bold())
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 8)
-                                    .background(Color.orange)
-                                    .foregroundColor(.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                }
-                                .padding(.top, 4)
+                                proxy.scrollTo(
+                                    "BOTTOM",
+                                    anchor: .bottom
+                                )
                             }
                         }
+                    }
+
+                    .onAppear {
+
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + 0.3
+                        ) {
+
+                            proxy.scrollTo(
+                                "BOTTOM",
+                                anchor: .bottom
+                            )
+                        }
+                    }
+                    }
+                
+                // INPUT
+                HStack {
+                    
+                    TextField("Сообщение...", text: $text)
                         .padding()
-                        .background(isMe ? Color.orange.opacity(0.85) : Color.white.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
-                        .frame(maxWidth: .infinity, alignment: isMe ? .trailing : .leading)
+                        .background(Color.white.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    Button {
+                        
+                        service.send(
+                            restaurantId: restaurantId,
+                            sender: auth.employeeName,
+                            senderId: auth.userId,
+                            text: text
+                        )
+                        
+                        text = ""
+                        
+                    } label: {
+                        Image(systemName: "paperplane.fill")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.orange)
+                            .clipShape(Circle())
+                    }
+                }
+                .padding()
+                .background(Color.black)
+            }
+            .background(Color.black.ignoresSafeArea())
+            .navigationTitle("Чат")
+            
+            // SHEET
+            .sheet(isPresented: $showCandidatesSheet) {
+                
+                VStack(spacing: 16) {
+                    
+                    Text("Выберите продукт")
+                        .font(.headline)
+                    
+                    if candidates.isEmpty {
+                        
+                        Text("Ничего не найдено")
+                            .foregroundColor(.gray)
+                        
+                        Button("Закрыть") {
+                            showCandidatesSheet = false
+                        }
+                        
+                    } else {
+                        
+                        ScrollView {
+                            
+                            VStack(spacing: 12) {
+                                
+                                ForEach(candidates, id: \.self) { item in
+                                    
+                                    Button {
+
+                                        selectedProductName = item
+
+                                    } label: {
+                                        
+                                        HStack {
+                                            Text(item)
+                                            Spacer()
+                                        }
+                                        .padding()
+                                        .background(Color.white.opacity(0.1))
+                                        .cornerRadius(12)
+                                    }
+                                }
+                                if !selectedProductName.isEmpty {
+
+                                    Text("Выбрано:")
+                                        .foregroundColor(.gray)
+
+                                    Text(selectedProductName)
+                                        .font(.headline)
+
+                                    Button {
+
+                                        applyWriteOff(
+                                            message: selectedMessage,
+                                            selectedName: selectedProductName
+                                        )
+
+                                        selectedProductName = ""
+                                        showCandidatesSheet = false
+
+                                    } label: {
+
+                                        Text("Подтвердить списание")
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background(Color.orange)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(12)
+                                    }
+                                }
+                            }
+                            .padding()
+                        }
                     }
                 }
                 .padding()
             }
-
-            // INPUT
-
-            HStack {
-
-                TextField("Сообщение...", text: $text)
-                    .padding()
-                    .background(Color.white.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-
-                Button {
-
-                    service.send(
-                        restaurantId: restaurantId,
-                        sender: auth.employeeName,
-                        senderId: auth.userId,
-                        text: text
-                    )
-
-                    text = ""
-
-                } label: {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.orange)
-                        .clipShape(Circle())
-                }
+            
+            .onAppear {
+                service.listen(restaurantId: restaurantId)
             }
-            .padding()
-        }
-        .background(Color.black.ignoresSafeArea())
-        .navigationTitle("Чат")
-
-        .alert("Подтвердить списание", isPresented: $showWriteOffAlert) {
-
-            Button("Отмена", role: .cancel) {}
-
-            Button("Списать") {
-                processWriteOff(pendingWriteOffText)
-            }
-
-        } message: {
-            Text(pendingWriteOffText)
-        }
-
-        .onAppear {
-            service.listen(restaurantId: restaurantId)
         }
     }
 }
