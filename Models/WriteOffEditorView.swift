@@ -13,12 +13,14 @@ struct WriteOffEditorView: View {
 
             List {
 
-                ForEach($items) { $item in
+                ForEach($items, id: \.id) { $item in
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
 
-                        Toggle(item.productName,
-                               isOn: $item.selected)
+                        Toggle(
+                            item.productName,
+                            isOn: $item.isSelected
+                        )
 
                         HStack {
 
@@ -55,7 +57,7 @@ struct WriteOffEditorView: View {
 
                     Button("Списать") {
 
-                        applyWriteOff()
+                        performWriteOff()
 
                         dismiss()
                     }
@@ -64,21 +66,20 @@ struct WriteOffEditorView: View {
         }
     }
 
-    private func applyWriteOff() {
+    private func performWriteOff() {
 
-        for item in items where item.selected {
+        for item in items where item.isSelected {
 
-            guard let index = store.products.firstIndex(where: {
+            if let index = store.products.firstIndex(where: {
                 $0.name.lowercased() ==
                 item.productName.lowercased()
-            }) else {
-                continue
-            }
+            }) {
 
-            store.products[index].quantityInGrams -= item.grams
+                store.products[index].quantityInGrams -= item.grams
 
-            if store.products[index].quantityInGrams < 0 {
-                store.products[index].quantityInGrams = 0
+                if store.products[index].quantityInGrams < 0 {
+                    store.products[index].quantityInGrams = 0
+                }
             }
         }
 

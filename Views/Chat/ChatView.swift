@@ -17,6 +17,8 @@ struct ChatView: View {
     @State private var candidates: [String] = []
     @State private var selectedMessage = ""
     
+    @State private var parsedItems: [ChatWriteOffItem] = []
+    
     @State private var selectedProductName = ""
     
     @State private var showWriteOffEditor = false
@@ -31,25 +33,25 @@ struct ChatView: View {
         lower.contains("списание")
     }
     func parseWriteOffMessage(_ text: String) -> [WriteOffDraftItem] {
-
+        
         var result: [WriteOffDraftItem] = []
-
+        
         let lines = text.components(separatedBy: .newlines)
-
+        
         for line in lines {
-
+            
             let words = line.split(separator: " ")
-
+            
             guard words.count >= 2 else {
                 continue
             }
-
+            
             guard let grams = Double(words.last!) else {
                 continue
             }
-
+            
             let productName = words.dropLast().joined(separator: " ")
-
+            
             result.append(
                 WriteOffDraftItem(
                     productName: productName,
@@ -57,43 +59,44 @@ struct ChatView: View {
                 )
             )
         }
-
+        
         return result
     }
     // MARK: search
     func findCandidates(from text: String) -> [String] {
-
+        
         let words = text.lowercased()
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { $0.count > 2 }
-
+        
         let allItems =
-            store.products.map { $0.name } +
-            store.semiProducts.map { $0.name }
-
+        store.products.map { $0.name } +
+        store.semiProducts.map { $0.name }
+        
         var result: [String] = []
-
+        
         for item in allItems {
-
+            
             let itemLower = item.lowercased()
-
+            
             for word in words {
-
+                
                 let root = String(word.prefix(4))
-
+                
                 if itemLower.contains(root) {
-
                     result.append(item)
                     break
                 }
             }
         }
-
+        
         return Array(Set(result)).sorted()
     }
     
-    // MARK: apply write off
-    func applyWriteOff(message: String, selectedName: String) {
+    func applyWriteOff(
+        message: String,
+        selectedName: String
+    ) {
         
         let lower = message.lowercased()
         
@@ -101,46 +104,60 @@ struct ChatView: View {
         
         guard
             let regex = try? NSRegularExpression(pattern: pattern),
-            let match = regex.firstMatch(in: lower, range: NSRange(lower.startIndex..., in: lower)),
+            let match = regex.firstMatch(
+                in: lower,
+                range: NSRange(lower.startIndex..., in: lower)
+            ),
             let range = Range(match.range, in: lower)
         else {
-            print("❌ не найдено количество")
             return
         }
         
-        let amountString = String(lower[range]).replacingOccurrences(of: ",", with: ".")
+        let amountString = String(lower[range])
+            .replacingOccurrences(of: ",", with: ".")
         
         guard let amount = Double(amountString) else {
-            print("❌ ошибка числа")
             return
         }
         
-        // PRODUCTS
         if let index = store.products.firstIndex(where: {
-            $0.name.lowercased().contains(selectedName.lowercased()) ||
-            selectedName.lowercased().contains($0.name.lowercased())
-            
-            
-            
-            
+            $0.name.lowercased() == selectedName.lowercased()
         }) {
             
             store.products[index].quantityInGrams -= amount
+            
+            if store.products[index].quantityInGrams < 0 {
+                store.products[index].quantityInGrams = 0
+            }
+            
+            store.save()
+        }
+    }
+    func performDraftWriteOff() {
+        
+        for item in draftItems where item.isSelected {
+            
+            guard let index = store.products.firstIndex(where: {
+                $0.name == item.productName
+            }) else { continue }
+            
+            store.products[index].quantityInGrams -= item.grams
+            
             if store.products[index].quantityInGrams < 0 {
                 store.products[index].quantityInGrams = 0
             }
             
             store.writeOffs.append(
                 WriteOffRecord(
-                    productName: store.products[index].name,
-                    grams: amount,
+                    productName: item.productName,
+                    grams: item.grams,
                     reason: "Чат",
                     employee: auth.employeeName
                 )
             )
-            
-            store.save()
         }
+        
+        store.save()
     }
     
     // MARK: BODY
@@ -208,13 +225,13 @@ struct ChatView: View {
                             .id("BOTTOM")
                     }
                     .padding(.bottom, 80)
-
+                    
                     .onChange(of: service.messages.count) { _ in
-
+                        
                         DispatchQueue.main.async {
-
+                            
                             withAnimation {
-
+                                
                                 proxy.scrollTo(
                                     "BOTTOM",
                                     anchor: .bottom
@@ -222,20 +239,20 @@ struct ChatView: View {
                             }
                         }
                     }
-
+                    
                     .onAppear {
-
+                        
                         DispatchQueue.main.asyncAfter(
                             deadline: .now() + 0.3
                         ) {
-
+                            
                             proxy.scrollTo(
                                 "BOTTOM",
                                 anchor: .bottom
                             )
                         }
                     }
-                    }
+                }
                 
                 // INPUT
                 HStack {
@@ -296,9 +313,9 @@ struct ChatView: View {
                                 ForEach(candidates, id: \.self) { item in
                                     
                                     Button {
-
+                                        
                                         selectedProductName = item
-
+                                        
                                     } label: {
                                         
                                         HStack {
@@ -311,25 +328,28 @@ struct ChatView: View {
                                     }
                                 }
                                 if !selectedProductName.isEmpty {
-
+                                    
                                     Text("Выбрано:")
                                         .foregroundColor(.gray)
-
+                                    
                                     Text(selectedProductName)
                                         .font(.headline)
-
+                                    
                                     Button {
-
-                                        applyWriteOff(
-                                            message: selectedMessage,
-                                            selectedName: selectedProductName
-                                        )
-
-                                        selectedProductName = ""
-                                        showCandidatesSheet = false
-
-                                    } label: {
-
+                                        
+                                        draftItems = [
+                                            WriteOffDraftItem(
+                                                productName: selectedProductName,
+                                                grams: 0
+                                            )
+                                        ]
+                                        
+                                        showWriteOffEditor = true
+                                        
+                                    }
+                                    
+                                    label: {
+                                        
                                         Text("Подтвердить списание")
                                             .frame(maxWidth: .infinity)
                                             .padding()
@@ -351,4 +371,6 @@ struct ChatView: View {
             }
         }
     }
+    
+    
 }

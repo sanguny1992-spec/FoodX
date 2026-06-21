@@ -1,6 +1,6 @@
 import Foundation
 
-struct WriteOffDraftItem: Identifiable {
+struct ChatWriteOffItem: Identifiable {
 
     let id = UUID()
 
@@ -8,5 +8,5 @@ struct WriteOffDraftItem: Identifiable {
 
     var grams: Double
 
-    var isSelected: Bool = true
+    var selected: Bool = true
 }
