@@ -15,6 +15,10 @@ final class FirebaseSyncService {
         semiProducts: [SemiFinishedProduct]
     ) {
 
+        print("🔥 SYNC ALL")
+        print("Dishes:", dishes.count)
+        print("Semi:", semiProducts.count)
+
         uploadMenu(dishes: dishes)
         uploadSemiProducts(semiProducts)
     }
@@ -55,7 +59,8 @@ func uploadMenu(dishes: [Dish]) {
     func uploadSemiProducts(
         _ semiProducts: [SemiFinishedProduct]
     ) {
-
+        print("🔥 UPLOAD SEMI")
+        print("Количество:", semiProducts.count)
         let mapped: [[String: Any]] = semiProducts.map { semi in
 
             [
@@ -79,7 +84,18 @@ func uploadMenu(dishes: [Dish]) {
             .setData([
                 "semiProducts": mapped,
                 "updatedAt": Timestamp()
-            ])
+            ]) { error in
+
+                if let error = error {
+
+                    print("❌ FIREBASE:", error.localizedDescription)
+
+                } else {
+
+                    print("✅ FIREBASE OK")
+
+                }
+            }
     }
 }
 

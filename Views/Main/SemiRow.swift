@@ -52,7 +52,11 @@ struct SemiRow: View {
                         }
                     
                     Button("Готово") {
+
+                        print("✅ Нажали Готово")
+
                         store.save()
+
                         isEditing = false
                     }
                     .foregroundColor(.green)

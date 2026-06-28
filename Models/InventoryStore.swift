@@ -2,6 +2,13 @@ import Foundation
 import SwiftUI
 import Combine
 
+
+struct SmartSearchResult {
+    var dishes: [Dish]
+    var semiProducts: [SemiFinishedProduct]
+    var products: [Product]
+}
+
 final class InventoryStore: ObservableObject {
     
     // MARK: DATA
@@ -56,6 +63,8 @@ final class InventoryStore: ObservableObject {
     }
     func save() {
         
+        print("🔥 SAVE CALLED")
+        
         if let encoded = try? JSONEncoder().encode(products) {
             
             UserDefaults.standard.set(
@@ -93,6 +102,8 @@ final class InventoryStore: ObservableObject {
             UserDefaults.standard.set(
                 encoded,
                 forKey: writeOffsKey
+                
+                
             )
         }
         // Синхронизация WEB
