@@ -3,6 +3,9 @@ import SwiftUI
 struct SemiProductsView: View {
 
     @ObservedObject var store: InventoryStore
+    
+
+    @State private var showCreateSemi = false
 
     var body: some View {
 
@@ -33,6 +36,26 @@ struct SemiProductsView: View {
             }
             .background(Color.black)
             .navigationTitle("Полуфабрикаты")
+
+            .toolbar {
+
+                ToolbarItem(placement: .topBarTrailing) {
+
+                    Button {
+
+                        showCreateSemi = true
+
+                    } label: {
+
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+
+            .sheet(isPresented: $showCreateSemi) {
+
+                CreateSemiView(store: store)
+            }
         }
     }
 }

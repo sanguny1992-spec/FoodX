@@ -1103,7 +1103,8 @@ function renderTopbar(){
 
                     ingredientsHTML += `
                         <div class="ingredient">
-                            ${i}
+                            <b>${i.name}</b>
+                            — ${i.grams} г
                         </div>
                     `;
                 });

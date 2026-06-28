@@ -95,6 +95,11 @@ final class InventoryStore: ObservableObject {
                 forKey: writeOffsKey
             )
         }
+        // Синхронизация WEB
+        FirebaseSyncService.shared.syncAll(
+            dishes: dishes,
+            semiProducts: semiProducts
+        )
     }
     
     // MARK: LOAD
