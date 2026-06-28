@@ -1044,10 +1044,15 @@ function renderTopbar(){
 
 /* MENU */
 
-window.loadMenu = function(){
+    window.loadMenu = function(){
 
-    const ref =
-        doc(db,"menus","main");
+        const ref = doc(
+            db,
+            "restaurants",
+            restaurantId,
+            "menus",
+            "main"
+        );
 
     onSnapshot(ref,snap => {
 
@@ -1056,6 +1061,9 @@ window.loadMenu = function(){
 
         const dishes =
             data?.dishes || [];
+            
+            console.log("MENU UPDATE");
+            console.log(dishes);
 
         document.body.innerHTML = `
 
@@ -1091,14 +1099,11 @@ window.loadMenu = function(){
 
                 let ingredientsHTML = "";
 
-                (dish.ingredients || [])
-                .forEach(i => {
+                (dish.ingredients || []).forEach(i => {
 
                     ingredientsHTML += `
                         <div class="ingredient">
-                            ${i.name || ""}
-                            —
-                            ${i.grams || 0} г
+                            ${i}
                         </div>
                     `;
                 });
@@ -1167,6 +1172,8 @@ window.loadMenu = function(){
         onSnapshot(semiRef,(snapshot)=>{
 
             let semiProducts = [];
+            
+            console.log("SEMI UPDATE");
 
             snapshot.forEach(docSnap=>{
 
@@ -1201,6 +1208,8 @@ window.loadMenu = function(){
                 return;
             }
 
+            console.log(semiProducts);
+            
             semiProducts.forEach(semi=>{
 
                 let ingredientsHTML = "";

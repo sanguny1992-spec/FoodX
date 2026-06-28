@@ -26,7 +26,11 @@ final class MenuShareService {
                 instruction: $0.instruction,
                 
                 ingredients: $0.ingredients.map {
-                    $0.name
+
+                    ShareIngredient(
+                        name: $0.name,
+                        grams: $0.grams
+                    )
                 }
             )
         }

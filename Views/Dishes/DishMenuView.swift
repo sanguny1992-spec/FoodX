@@ -11,6 +11,8 @@ struct DishMenuView: View {
     @State private var shareLink = ""
     @State private var showShare = false
     
+    @StateObject private var authManager = AuthManager()
+    
     @ObservedObject var store: InventoryStore
     
     @State private var selectedCategory = "Все"
@@ -79,10 +81,10 @@ struct DishMenuView: View {
                                     .foregroundColor(.orange)
                             }
                             .onAppear {
-                                
+
                                 currentEmployee.loadEmployee(
                                     restaurantId:
-                                        "auth.restaurantId"
+                                        authManager.restaurantId
                                 )
                             }
                         }
@@ -349,7 +351,7 @@ struct DishMenuView: View {
             service.uploadMenu(
                 
                 dishes: store.dishes,
-                restaurantId: "auth.restaurantId"
+                restaurantId: authManager.restaurantId
                 
             ) { result in
                 

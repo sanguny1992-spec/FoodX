@@ -4,7 +4,7 @@ import FirebaseFirestore
 import Combine
 
 final class CurrentEmployeeManager:
-ObservableObject {
+    ObservableObject {
     
     @Published var employee: Employee?
     
@@ -14,8 +14,14 @@ ObservableObject {
         restaurantId: String
     ) {
         
+        guard !restaurantId.isEmpty else {
+            
+            print("RestaurantId is empty")
+            return
+        }
+        
         guard let uid =
-            Auth.auth().currentUser?.uid
+                Auth.auth().currentUser?.uid
         else {
             return
         }
@@ -38,19 +44,15 @@ ObservableObject {
                 
                 do {
                     
-                    let employee =
-                        try snapshot.data(
-                            as: Employee.self
-                        )
+                    let employee = try snapshot.data(as: Employee.self)
                     
                     DispatchQueue.main.async {
                         
-                        self.employee =
-                            employee
+                        self.employee = employee
                     }
                     
                 } catch {
-                    
+                   
                     print(error.localizedDescription)
                 }
             }

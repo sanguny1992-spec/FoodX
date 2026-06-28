@@ -12,5 +12,5 @@ struct ShareDish: Codable {
 
     var instruction: String
 
-    var ingredients: [String]
+    var ingredients: [ShareIngredient]
 }

@@ -14,6 +14,8 @@ struct DishBuilderView: View {
     @State private var instruction = ""
     @State private var category = ""
     
+    @EnvironmentObject var auth: AuthManager
+    
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var imageData: Data?
     
@@ -310,6 +312,20 @@ struct DishBuilderView: View {
                             }
                             
                             store.save()
+                            MenuShareService().uploadMenu(
+                                dishes: store.dishes,
+                                restaurantId: auth.restaurantId
+                            ) { result in
+
+                                switch result {
+
+                                case .success:
+                                    print("✅ WEB обновлен")
+
+                                case .failure(let error):
+                                    print(error)
+                                }
+                            }
                             dismiss()
                             
                         } label: {
