@@ -126,7 +126,24 @@ final class InventoryStore: ObservableObject {
                 print(error)
             }
         }
-        
+        func ensureProductExists(name: String) -> Product {
+
+            if let existing = products.first(where: {
+                $0.name.lowercased() == name.lowercased()
+            }) {
+                return existing
+            }
+
+            let new = Product(
+                name: name,
+                quantityInGrams: 0
+            )
+
+            products.append(new)
+            save()
+
+            return new
+        }
         // SEMI PRODUCTS
         if let data = UserDefaults.standard.data(
             forKey: semiKey

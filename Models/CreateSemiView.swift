@@ -9,6 +9,7 @@ struct CreateSemiView: View {
     @State private var name = ""
     @State private var grams = ""
     @State private var instruction = ""
+    
 
     var body: some View {
 
